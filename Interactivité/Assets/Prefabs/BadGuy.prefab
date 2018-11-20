@@ -59,7 +59,6 @@ GameObject:
   - component: {fileID: 136319289778055790}
   - component: {fileID: 23762929964905422}
   - component: {fileID: 114075782502765776}
-  - component: {fileID: 114610656882964464}
   m_Layer: 0
   m_Name: BadGuy
   m_TagString: Untagged
@@ -243,20 +242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Sensor: {fileID: 0}
---- !u!114 &114610656882964464
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1722232220514568}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd488686f4bf4274e8f120eff716f4f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SensorRadius: 16
-  FieldOfView: 60
-  _reactionTime: 1
+  ReactionTime: 5
 --- !u!135 &135176685325243812
 SphereCollider:
   m_ObjectHideFlags: 1

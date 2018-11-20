@@ -15,7 +15,7 @@ public class RotateState : State<AI>
     
     public override void EnterState(AI _owner)
     {
-        
+        _owner.Sensor.ResetSensor();
     }
 
     public override void ExitState(AI _owner)

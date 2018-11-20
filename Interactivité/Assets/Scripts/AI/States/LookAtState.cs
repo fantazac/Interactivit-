@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class LookAtState : State<AI>
 {
-	float _reactionTime;
 	GameObject _target;
-	
+	float _reactionTime;
+	float _currentAlertLevel;
 	
 	public LookAtState(GameObject target, float reactionTime)
 	{
@@ -27,11 +27,8 @@ public class LookAtState : State<AI>
 	public override void Update(AI _owner)
 	{
 		if (_target == null)
-		{
-			// todo: change state back to rotation
-		}
+			_owner.OnTargetLost();
 
-		// todo check if we can still see the target
 		RaycastHit hit;
 		bool canSeeTarget = false;
 		
@@ -39,7 +36,6 @@ public class LookAtState : State<AI>
 		{
 			if (hit.collider.CompareTag(SensorManager._TagToLookFor))
 			{
-				Debug.DrawLine(_owner.transform.position, hit.point, Color.cyan);
 				canSeeTarget = true;
 			}
 		}
@@ -48,10 +44,17 @@ public class LookAtState : State<AI>
 		// Handle reaction time
 		if (canSeeTarget)
 		{
+			_currentAlertLevel += canSeeTarget ? Time.deltaTime : -Time.deltaTime / 5f;
+			if (_currentAlertLevel >= _reactionTime)
+			{
+				_owner.OnTargetFound(_target);
+			}
+			_currentAlertLevel = Mathf.Clamp(_currentAlertLevel, 0f, _reactionTime);
 			
+			//todo fix
+			Debug.Log(_currentAlertLevel + " / " + _reactionTime);
 		}
 		
-		// todo rotate if we do
 		Vector3 LookAtPosition = _target.transform.position;
 		LookAtPosition.y = _owner.transform.position.y;
 		_owner.transform.LookAt(LookAtPosition);

@@ -4,25 +4,18 @@ using UnityEngine;
 
 public class SightSensor : MonoBehaviour
 {
-
-	[Tooltip("The radius from which the sensor will react when it sees something")]
-	public float SensorRadius = 16f;
-	
-	[Tooltip("The field of view in angle")]
+	public float ViewDistance = 16f;
 	public float FieldOfView = 60f;
 	
-	[SerializeField] float _reactionTime = 1f;
-	
-	float _currentAlertLevel;
 	private Color _gizmosDrawColor = Color.green;
-
+	
+	// Sensor status
 	private GameObject _lastSeenTarget;
-	private GameObject _foundTraget;
-	private bool _hasFoundTarget;
+	private bool _canSeeTarget;
 	
 	
 	#region Monobehaviour Callbacks
-
+	
 	private void Start()
 	{
 		ResetSensor();
@@ -30,42 +23,33 @@ public class SightSensor : MonoBehaviour
 
 	void Update ()
 	{
-		if (_hasFoundTarget)
+		if (_canSeeTarget)
 			return;
 		
 		_gizmosDrawColor = Color.green;
-		bool hasSeenTarget = false;
 		int numberOfTargets = SensorManager.TargetCount();
 		
 		//! Si trop lourd, ne verifier qu'un seul joueur par frame (index++ % _numberOfTargets)
 		for (int index = 0; index < numberOfTargets; index++)
 		{
-			if (TargetIsOnSight(SensorManager.GetTargetPosition(index)))
-			{
-				hasSeenTarget = true;
-			}
+			CheckIfTargetIsOnSight(SensorManager.GetTargetPosition(index));
 		}
 		
-		// Handle reaction time
-		_currentAlertLevel += hasSeenTarget ? Time.deltaTime : -Time.deltaTime / 5f;
-		if (_currentAlertLevel >= _reactionTime)
-		{
-			_hasFoundTarget = true;
-			_foundTraget = _lastSeenTarget;
-		}
-		_currentAlertLevel = Mathf.Clamp(_currentAlertLevel, 0f, _reactionTime);
-		
-		
-		// Debug draw sensor field of view
-		Debug.DrawLine(transform.position, transform.position + transform.rotation * Quaternion.Euler(0f, FieldOfView / 2f, 0f) * Vector3.forward * SensorRadius, _gizmosDrawColor);
-		Debug.DrawLine(transform.position, transform.position + transform.rotation * Quaternion.Euler(0f, -FieldOfView / 2f, 0f) * Vector3.forward * SensorRadius, _gizmosDrawColor);
+		Debug.DrawLine(transform.position, transform.position + transform.rotation * Quaternion.Euler(0f, FieldOfView / 2f, 0f) * Vector3.forward * ViewDistance, _gizmosDrawColor);
+		Debug.DrawLine(transform.position, transform.position + transform.rotation * Quaternion.Euler(0f, -FieldOfView / 2f, 0f) * Vector3.forward * ViewDistance, _gizmosDrawColor);
 	}
 
 	#endregion
 
-	bool TargetIsOnSight(GameObject target)
+	public void SetupSensor(float _viewDistance, float _fieldOfView)
 	{
-		if ((transform.position - target.transform.position).magnitude <= SensorRadius)
+		FieldOfView = _fieldOfView;
+		ViewDistance = _viewDistance;
+	}
+
+	void CheckIfTargetIsOnSight(GameObject target)
+	{
+		if ((transform.position - target.transform.position).magnitude <= ViewDistance)
 		{
 			if (Vector3.Angle(target.transform.position - transform.position, transform.forward) <= FieldOfView / 2f)
 			{
@@ -76,35 +60,31 @@ public class SightSensor : MonoBehaviour
 				{
 					if (hit.collider.CompareTag(SensorManager._TagToLookFor))
 					{
-						_gizmosDrawColor = Color.red;
-						
-						Debug.DrawLine(transform.position, hit.point, _gizmosDrawColor);
-
 						_lastSeenTarget = target;
-						return true;
+						_canSeeTarget = true;
+						return;
 					}
 						
 					Debug.DrawLine(transform.position, hit.point, _gizmosDrawColor);
 				}
 			}
 		}
-		return false;
+		_canSeeTarget = false;
 	}
 		
 	public void ResetSensor()
 	{
-		_hasFoundTarget = false;
-		_currentAlertLevel = 0f;
+		_canSeeTarget = false;
 	}
 
-	public bool HasFoundTarget()
+	public bool CanSeeTarget()
 	{
-		return _hasFoundTarget;
+		return _canSeeTarget;
 	}
 
 	public GameObject GetTarget()
 	{
-		return _foundTraget;
+		return _lastSeenTarget;
 	}
 
 }

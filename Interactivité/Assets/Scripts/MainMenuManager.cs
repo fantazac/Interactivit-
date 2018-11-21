@@ -92,8 +92,10 @@ public class MainMenuManager : MonoBehaviour
 
         //do countdown
 
-        StaticObjects.CharacterNetworkManager.GetComponent<CharacterMovement>().enabled = true;
-        StaticObjects.CharacterNetworkManager.GetComponent<InputManager>().enabled = true;
+        StaticObjects.CharacterNetworkManager.gameObject.AddComponent<CapsuleCollider>();
+        Rigidbody rigidbody = StaticObjects.CharacterNetworkManager.gameObject.AddComponent<Rigidbody>();
+        rigidbody.useGravity = false;
+        StaticObjects.CharacterNetworkManager.gameObject.AddComponent<InputManager>();
     }
 
     private void OnNetworkConnectedToServer(bool createdMap)

@@ -14,6 +14,11 @@ public class InputManager : MonoBehaviour
     public delegate void OnMoveRightHandler(bool move);
     public event OnMoveRightHandler OnMoveRight;
 
+    private void Start()
+    {
+        GetComponent<CharacterMovement>().SetupMovementInputs(this);
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.W))

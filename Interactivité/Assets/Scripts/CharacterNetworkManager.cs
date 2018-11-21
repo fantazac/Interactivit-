@@ -3,10 +3,12 @@
 public class CharacterNetworkManager : MonoBehaviour
 {
     private PhotonView photonView;
+    private CharacterMovement characterMovement;
 
     private void Awake()
     {
         photonView = GetComponent<PhotonView>();
+        characterMovement = GetComponent<CharacterMovement>();
     }
 
     public void SendToServer_Ready()
@@ -29,5 +31,49 @@ public class CharacterNetworkManager : MonoBehaviour
     private void ReceiveFromServer_Start()
     {
         StaticObjects.MainMenuManager.OnReceiveStartFromServer();
+    }
+
+    public void SendToServer_MoveLeft(bool moveLeft)
+    {
+        photonView.RPC("ReceiveFromServer_MoveLeft", PhotonTargets.AllViaServer, moveLeft);
+    }
+
+    [PunRPC]
+    private void ReceiveFromServer_MoveLeft(bool moveLeft)
+    {
+        characterMovement.OnReceiveMoveLeftFromServer(moveLeft);
+    }
+
+    public void SendToServer_MoveRight(bool moveRight)
+    {
+        photonView.RPC("ReceiveFromServer_MoveRight", PhotonTargets.AllViaServer, moveRight);
+    }
+
+    [PunRPC]
+    private void ReceiveFromServer_MoveRight(bool moveRight)
+    {
+        characterMovement.OnReceiveMoveRightFromServer(moveRight);
+    }
+
+    public void SendToServer_MoveUp(bool moveUp)
+    {
+        photonView.RPC("ReceiveFromServer_MoveUp", PhotonTargets.AllViaServer, moveUp);
+    }
+
+    [PunRPC]
+    private void ReceiveFromServer_MoveUp(bool moveUp)
+    {
+        characterMovement.OnReceiveMoveUpFromServer(moveUp);
+    }
+
+    public void SendToServer_MoveDown(bool moveDown)
+    {
+        photonView.RPC("ReceiveFromServer_MoveDown", PhotonTargets.AllViaServer, moveDown);
+    }
+
+    [PunRPC]
+    private void ReceiveFromServer_MoveDown(bool moveDown)
+    {
+        characterMovement.OnReceiveMoveDownFromServer(moveDown);
     }
 }

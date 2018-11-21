@@ -38,4 +38,9 @@ MonoBehaviour:
   - RequestForPickupTimes
   - ReceiveFromServer_Ready
   - ReceiveFromServer_Start
+  - ReceiveFromServer_Movement
+  - ReceiveFromServer_MoveDown
+  - ReceiveFromServer_MoveLeft
+  - ReceiveFromServer_MoveRight
+  - ReceiveFromServer_MoveUp
   DisableAutoOpenWizard: 1

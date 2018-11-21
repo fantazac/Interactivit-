@@ -9,6 +9,8 @@ public class CharacterMovement : MonoBehaviour
 
     private float movementSpeed;
 
+    private CharacterNetworkManager characterNetworkManager;
+
     private CharacterMovement()
     {
         movementSpeed = 5;
@@ -16,14 +18,15 @@ public class CharacterMovement : MonoBehaviour
 
     private void Start()
     {
-        InputManager inputManager = GetComponent<InputManager>();
-        if (inputManager.enabled)
-        {
-            inputManager.OnMoveLeft += OnMoveLeft;
-            inputManager.OnMoveRight += OnMoveRight;
-            inputManager.OnMoveUp += OnMoveUp;
-            inputManager.OnMoveDown += OnMoveDown;
-        }
+        characterNetworkManager = GetComponent<CharacterNetworkManager>();
+    }
+
+    public void SetupMovementInputs(InputManager inputManager)
+    {
+        inputManager.OnMoveLeft += OnMoveLeft;
+        inputManager.OnMoveRight += OnMoveRight;
+        inputManager.OnMoveUp += OnMoveUp;
+        inputManager.OnMoveDown += OnMoveDown;
     }
 
     private void Update()
@@ -48,21 +51,41 @@ public class CharacterMovement : MonoBehaviour
 
     private void OnMoveLeft(bool move)
     {
-        moveLeft = move;
+        characterNetworkManager.SendToServer_MoveLeft(move);
     }
 
     private void OnMoveRight(bool move)
     {
-        moveRight = move;
+        characterNetworkManager.SendToServer_MoveRight(move);
     }
 
     private void OnMoveUp(bool move)
     {
-        moveUp = move;
+        characterNetworkManager.SendToServer_MoveUp(move);
     }
 
     private void OnMoveDown(bool move)
     {
-        moveDown = move;
+        characterNetworkManager.SendToServer_MoveDown(move);
+    }
+
+    public void OnReceiveMoveLeftFromServer(bool moveLeft)
+    {
+        this.moveLeft = moveLeft;
+    }
+
+    public void OnReceiveMoveRightFromServer(bool moveRight)
+    {
+        this.moveRight = moveRight;
+    }
+
+    public void OnReceiveMoveUpFromServer(bool moveUp)
+    {
+        this.moveUp = moveUp;
+    }
+
+    public void OnReceiveMoveDownFromServer(bool moveDown)
+    {
+        this.moveDown = moveDown;
     }
 }

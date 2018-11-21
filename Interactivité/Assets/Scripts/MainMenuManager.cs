@@ -93,6 +93,7 @@ public class MainMenuManager : MonoBehaviour
         //do countdown
 
         StaticObjects.CharacterNetworkManager.GetComponent<CharacterMovement>().enabled = true;
+        StaticObjects.CharacterNetworkManager.GetComponent<InputManager>().enabled = true;
     }
 
     private void OnNetworkConnectedToServer(bool createdMap)
@@ -109,7 +110,6 @@ public class MainMenuManager : MonoBehaviour
         character = PhotonNetwork.Instantiate("Character", createdMap ? spawn1 : spawn2, Quaternion.identity, 0);
         character.transform.parent = characterTemplate.transform;
         StaticObjects.CharacterNetworkManager = character.GetComponent<CharacterNetworkManager>();
-        character.GetComponent<InputManager>().enabled = true;
 
         mainMenuCamera.SetActive(false);
     }

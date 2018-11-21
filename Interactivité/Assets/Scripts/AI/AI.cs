@@ -10,8 +10,6 @@ public class AI : MonoBehaviour
     public float FieldOfView = 30f;
     public float ReactionTime = 5f;
 
-
-    // Use this for initialization
     private void Start()
     {
         Sensor = gameObject.AddComponent<SightSensor>();
@@ -20,7 +18,6 @@ public class AI : MonoBehaviour
         StateMachine = new StateMachine<AI>(this, new RotateState(.5f, 30f));
     }
 
-    // Update is called once per frame
     private void Update()
     {
         if (Sensor.CanSeeTarget())

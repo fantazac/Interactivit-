@@ -29,6 +29,8 @@ public class MainMenuManager : MonoBehaviour
 
     private void Start()
     {
+        StaticObjects.MainMenuManager = this;
+
         GetComponent<NetworkConnectionManager>().OnConnectedToServer += OnNetworkConnectedToServer;
 
         state = MainMenuState.MAIN;
@@ -56,7 +58,7 @@ public class MainMenuManager : MonoBehaviour
                 {
                     if (GUILayout.Button("Ready to play!", GUILayout.Height(40)))
                     {
-                        //send info to the 2 players that this one is ready
+                        StaticObjects.Character.GetComponent<CharacterNetworkManager>().SendToServer_Ready();
                         state = MainMenuState.READY_TO_PLAY;
                     }
                 }
@@ -72,6 +74,15 @@ public class MainMenuManager : MonoBehaviour
             case MainMenuState.IN_GAME:
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length);
                 break;
+        }
+    }
+
+    public void OnReceiveReadyFromServer()
+    {
+        playersReady++;
+        if(createdMap && playersReady == 2)
+        {
+            //start game online
         }
     }
 

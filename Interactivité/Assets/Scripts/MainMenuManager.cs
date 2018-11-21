@@ -58,8 +58,8 @@ public class MainMenuManager : MonoBehaviour
                 {
                     if (GUILayout.Button("Ready to play!", GUILayout.Height(40)))
                     {
-                        StaticObjects.Character.GetComponent<CharacterNetworkManager>().SendToServer_Ready();
                         state = MainMenuState.READY_TO_PLAY;
+                        StaticObjects.CharacterNetworkManager.SendToServer_Ready();
                     }
                 }
                 else
@@ -82,8 +82,17 @@ public class MainMenuManager : MonoBehaviour
         playersReady++;
         if(createdMap && playersReady == 2)
         {
-            //start game online
+            StaticObjects.CharacterNetworkManager.SendToServer_Start();
         }
+    }
+
+    public void OnReceiveStartFromServer()
+    {
+        state = MainMenuState.IN_GAME;
+
+        //do countdown
+
+        StaticObjects.CharacterNetworkManager.GetComponent<CharacterMovement>().enabled = true;
     }
 
     private void OnNetworkConnectedToServer(bool createdMap)
@@ -99,7 +108,7 @@ public class MainMenuManager : MonoBehaviour
         GameObject character;
         character = PhotonNetwork.Instantiate("Character", createdMap ? spawn1 : spawn2, Quaternion.identity, 0);
         character.transform.parent = characterTemplate.transform;
-        StaticObjects.Character = character;
+        StaticObjects.CharacterNetworkManager = character.GetComponent<CharacterNetworkManager>();
         character.GetComponent<InputManager>().enabled = true;
 
         mainMenuCamera.SetActive(false);

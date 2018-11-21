@@ -37,4 +37,5 @@ MonoBehaviour:
   - RequestForPickupItems
   - RequestForPickupTimes
   - ReceiveFromServer_Ready
+  - ReceiveFromServer_Start
   DisableAutoOpenWizard: 1

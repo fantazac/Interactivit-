@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class NetworkManager : MonoBehaviour
+public class NetworkConnectionManager : MonoBehaviour
 {
     public delegate void OnConnectedToServerHandler(bool createdMap);
     public event OnConnectedToServerHandler OnConnectedToServer;

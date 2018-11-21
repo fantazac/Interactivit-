@@ -2,35 +2,54 @@
 
 public class InputManager : MonoBehaviour
 {
-    public delegate void OnPressedWHandler();
-    public event OnPressedWHandler OnPressedW;
+    public delegate void OnMoveUpHandler(bool move);
+    public event OnMoveUpHandler OnMoveUp;
 
-    public delegate void OnPressedAHandler();
-    public event OnPressedAHandler OnPressedA;
+    public delegate void OnMoveDownHandler(bool move);
+    public event OnMoveDownHandler OnMoveDown;
 
-    public delegate void OnPressedSHandler();
-    public event OnPressedSHandler OnPressedS;
+    public delegate void OnMoveLeftHandler(bool move);
+    public event OnMoveLeftHandler OnMoveLeft;
 
-    public delegate void OnPressedDHandler();
-    public event OnPressedDHandler OnPressedD;
+    public delegate void OnMoveRightHandler(bool move);
+    public event OnMoveRightHandler OnMoveRight;
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.W))
         {
-            //move up
+            OnMoveUp(true);
         }
+        else if (Input.GetKeyUp(KeyCode.W))
+        {
+            OnMoveUp(false);
+        }
+
         if (Input.GetKeyDown(KeyCode.A))
         {
-            //move left
+            OnMoveLeft(true);
         }
+        else if (Input.GetKeyUp(KeyCode.A))
+        {
+            OnMoveLeft(false);
+        }
+
         if (Input.GetKeyDown(KeyCode.S))
         {
-            //move down
+            OnMoveDown(true);
         }
+        else if (Input.GetKeyUp(KeyCode.S))
+        {
+            OnMoveDown(false);
+        }
+
         if (Input.GetKeyDown(KeyCode.D))
         {
-            //move right
+            OnMoveRight(true);
+        }
+        else if (Input.GetKeyUp(KeyCode.D))
+        {
+            OnMoveRight(false);
         }
     }
 }

@@ -21,23 +21,18 @@ public class MainMenuManager : MonoBehaviour
 
     private MainMenuManager()
     {
-        spawn1 = Vector3.left * 9 + Vector3.up * 0.5f + Vector3.back * 14;//TODO
-        spawn2 = Vector3.right * 21 + Vector3.up * 0.5f + Vector3.forward * 9;//TODO
+        spawn1 = Vector3.left * 20 + Vector3.up * 0.5f;//TODO
+        spawn2 = Vector3.right * 20 + Vector3.up * 0.5f;//TODO
 
         characterParentPrefabPath = "CharacterTemplatePrefab/CharacterTemplate";
     }
 
     private void Start()
     {
-        GetComponent<NetworkManager>().OnConnectedToServer += OnConnectedToServer;
+        GetComponent<NetworkConnectionManager>().OnConnectedToServer += OnNetworkConnectedToServer;
 
         state = MainMenuState.MAIN;
 
-        LoadPrefabs();
-    }
-
-    private void LoadPrefabs()
-    {
         characterParentPrefab = Resources.Load<GameObject>(characterParentPrefabPath);
     }
 
@@ -80,35 +75,23 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    private void OnConnectedToServer(bool createdMap)
+    private void OnNetworkConnectedToServer(bool createdMap)
     {
         this.createdMap = createdMap;
-        if (createdMap)
-        {
-            SpawnPlayer();
-        }
-        else
-        {
-            SpawnPlayer(Quaternion.Euler(0, -180, 0));
-        }
+        SpawnPlayer();
         state = MainMenuState.IN_ROOM;
     }
 
-    private void SpawnPlayer(Quaternion rotation = new Quaternion())
+    private void SpawnPlayer()
     {
         GameObject characterTemplate = Instantiate(characterParentPrefab);
         GameObject character;
-        character = PhotonNetwork.Instantiate("Character", createdMap ? spawn1 : spawn2, rotation, 0);
+        character = PhotonNetwork.Instantiate("Character", createdMap ? spawn1 : spawn2, Quaternion.identity, 0);
         character.transform.parent = characterTemplate.transform;
         StaticObjects.Character = character;
         character.GetComponent<InputManager>().enabled = true;
 
         mainMenuCamera.SetActive(false);
-    }
-
-    private void OnDestroy()
-    {
-        PhotonNetwork.Destroy(StaticObjects.Character.transform.parent.gameObject);
     }
 }
 

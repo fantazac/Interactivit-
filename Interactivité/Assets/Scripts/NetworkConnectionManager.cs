@@ -7,7 +7,7 @@ public class NetworkConnectionManager : MonoBehaviour
 
     private void Start()
     {
-        MainMenuManager mainMenuManager = GetComponent<MainMenuManager>();
+        GameController mainMenuManager = GetComponent<GameController>();
         mainMenuManager.OnConnectingToServer += OnConnectingToServer;
     }
 

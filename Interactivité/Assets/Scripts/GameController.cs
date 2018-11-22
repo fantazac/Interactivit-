@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class MainMenuManager : MonoBehaviour
+public class GameController : MonoBehaviour
 {
     [SerializeField]
     private GameObject mainMenuCamera;
@@ -8,34 +8,44 @@ public class MainMenuManager : MonoBehaviour
     private string characterParentPrefabPath;
     private GameObject characterParentPrefab;
 
+    private string endPrefabPath;
+    private GameObject endPrefab;
+
     private MainMenuState state;
 
     private Vector3 spawn1;
     private Vector3 spawn2;
+    private Vector3 end1;
+    private Vector3 end2;
 
     private int playersReady;
     private bool createdMap;
+    private bool isWinner;
 
     public delegate void OnConnectingToServerHandler();
     public event OnConnectingToServerHandler OnConnectingToServer;
 
-    private MainMenuManager()
+    private GameController()
     {
-        spawn1 = Vector3.left * 21 + Vector3.up * 0.5f + Vector3.forward * 2;
-        spawn2 = Vector3.right * 21 + Vector3.up * 0.5f + Vector3.forward * 2;
+        spawn1 = new Vector3(-21, 0.5f, 2);
+        spawn2 = new Vector3(21, 0.5f, 2);
+        end1 = new Vector3(18.5f, 0.5f, 2);
+        end2 = new Vector3(-18.5f, 0.5f, 2);
 
         characterParentPrefabPath = "CharacterTemplatePrefab/CharacterTemplate";
+        endPrefabPath = "EndPrefab/End";
     }
 
     private void Start()
     {
-        StaticObjects.MainMenuManager = this;
+        StaticObjects.GameController = this;
 
         GetComponent<NetworkConnectionManager>().OnConnectedToServer += OnNetworkConnectedToServer;
 
         state = MainMenuState.MAIN;
 
         characterParentPrefab = Resources.Load<GameObject>(characterParentPrefabPath);
+        endPrefab = Resources.Load<GameObject>(endPrefabPath);
     }
 
     private void OnGUI()
@@ -74,6 +84,17 @@ public class MainMenuManager : MonoBehaviour
             case MainMenuState.IN_GAME:
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length);
                 break;
+            case MainMenuState.END:
+                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
+                if (isWinner)
+                {
+                    GUILayout.Label("You won!!!");
+                }
+                else
+                {
+                    GUILayout.Label("You lost...");
+                }
+                break;
         }
     }
 
@@ -111,11 +132,25 @@ public class MainMenuManager : MonoBehaviour
     {
         GameObject characterTemplate = Instantiate(characterParentPrefab);
         GameObject character;
-        character = PhotonNetwork.Instantiate("Character", createdMap ? spawn1 : spawn2, Quaternion.identity, 0);
-        character.transform.parent = characterTemplate.transform;
+        character = PhotonNetwork.Instantiate("Character" + (createdMap ? 1 : 2), createdMap ? spawn1 : spawn2, Quaternion.identity, 0);
         StaticObjects.CharacterNetworkManager = character.GetComponent<CharacterNetworkManager>();
+        Instantiate(endPrefab, createdMap ? end1 : end2, Quaternion.identity).GetComponent<EndManager>().SetCharacter(character);
+        character.transform.parent = characterTemplate.transform;
 
         mainMenuCamera.SetActive(false);
+    }
+
+    public void EndGame()
+    {
+        StaticObjects.CharacterNetworkManager.SendToServer_End(createdMap);
+    }
+
+    public void OnReceiveEndFromServer(bool createdMap)
+    {
+        Destroy(StaticObjects.CharacterNetworkManager.GetComponent<InputManager>());
+        StaticObjects.CharacterNetworkManager.GetComponent<CharacterMovement>().StopAllMovement();
+        isWinner = this.createdMap == createdMap;
+        state = MainMenuState.END;
     }
 }
 
@@ -126,4 +161,5 @@ enum MainMenuState
     IN_ROOM,
     READY_TO_PLAY,
     IN_GAME,
+    END,
 }

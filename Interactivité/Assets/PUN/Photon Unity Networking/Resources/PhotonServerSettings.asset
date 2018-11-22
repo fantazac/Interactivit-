@@ -43,4 +43,5 @@ MonoBehaviour:
   - ReceiveFromServer_MoveLeft
   - ReceiveFromServer_MoveRight
   - ReceiveFromServer_MoveUp
+  - ReceiveFromServer_End
   DisableAutoOpenWizard: 1

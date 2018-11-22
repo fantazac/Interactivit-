@@ -19,7 +19,7 @@ public class CharacterNetworkManager : MonoBehaviour
     [PunRPC]
     private void ReceiveFromServer_Ready()
     {
-        StaticObjects.MainMenuManager.OnReceiveReadyFromServer();
+        StaticObjects.GameController.OnReceiveReadyFromServer();
     }
 
     public void SendToServer_Start()
@@ -30,7 +30,7 @@ public class CharacterNetworkManager : MonoBehaviour
     [PunRPC]
     private void ReceiveFromServer_Start()
     {
-        StaticObjects.MainMenuManager.OnReceiveStartFromServer();
+        StaticObjects.GameController.OnReceiveStartFromServer();
     }
 
     public void SendToServer_MoveLeft(bool moveLeft)
@@ -75,5 +75,16 @@ public class CharacterNetworkManager : MonoBehaviour
     private void ReceiveFromServer_MoveDown(bool moveDown)
     {
         characterMovement.OnReceiveMoveDownFromServer(moveDown);
+    }
+
+    public void SendToServer_End(bool createdMap)
+    {
+        photonView.RPC("ReceiveFromServer_End", PhotonTargets.AllViaServer, createdMap);
+    }
+
+    [PunRPC]
+    private void ReceiveFromServer_End(bool createdMap)
+    {
+        StaticObjects.GameController.OnReceiveEndFromServer(createdMap);
     }
 }

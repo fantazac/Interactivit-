@@ -88,4 +88,12 @@ public class CharacterMovement : MonoBehaviour
     {
         this.moveDown = moveDown;
     }
+
+    public void StopAllMovement()
+    {
+        OnMoveLeft(false);
+        OnMoveRight(false);
+        OnMoveUp(false);
+        OnMoveDown(false);
+    }
 }

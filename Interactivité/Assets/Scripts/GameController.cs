@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
@@ -81,6 +82,10 @@ public class GameController : MonoBehaviour
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
                 GUILayout.Label("Waiting for the other player to be ready...");
                 break;
+            case MainMenuState.IN_COUNTDOWN:
+                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
+                GUILayout.Label("GO!!!");
+                break;
             case MainMenuState.IN_GAME:
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length);
                 break;
@@ -109,10 +114,16 @@ public class GameController : MonoBehaviour
 
     public void OnReceiveStartFromServer()
     {
+        StartCoroutine(Countdown());
+    }
+
+    private IEnumerator Countdown()
+    {
+        state = MainMenuState.IN_COUNTDOWN;
+
+        yield return new WaitForSeconds(1);
+
         state = MainMenuState.IN_GAME;
-
-        //do countdown
-
         StaticObjects.CharacterNetworkManager.gameObject.AddComponent<InputManager>();
     }
 
@@ -160,6 +171,7 @@ enum MainMenuState
     CONNECTING,
     IN_ROOM,
     READY_TO_PLAY,
+    IN_COUNTDOWN,
     IN_GAME,
     END,
 }

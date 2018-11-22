@@ -21,8 +21,8 @@ public class MainMenuManager : MonoBehaviour
 
     private MainMenuManager()
     {
-        spawn1 = Vector3.left * 20 + Vector3.up * 0.5f;//TODO
-        spawn2 = Vector3.right * 20 + Vector3.up * 0.5f;//TODO
+        spawn1 = Vector3.left * 21 + Vector3.up * 0.5f + Vector3.forward * 2;
+        spawn2 = Vector3.right * 21 + Vector3.up * 0.5f + Vector3.forward * 2;
 
         characterParentPrefabPath = "CharacterTemplatePrefab/CharacterTemplate";
     }
@@ -92,9 +92,6 @@ public class MainMenuManager : MonoBehaviour
 
         //do countdown
 
-        StaticObjects.CharacterNetworkManager.gameObject.AddComponent<CapsuleCollider>();
-        Rigidbody rigidbody = StaticObjects.CharacterNetworkManager.gameObject.AddComponent<Rigidbody>();
-        rigidbody.useGravity = false;
         StaticObjects.CharacterNetworkManager.gameObject.AddComponent<InputManager>();
     }
 

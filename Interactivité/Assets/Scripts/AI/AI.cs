@@ -3,39 +3,46 @@
 public class AI : MonoBehaviour
 {
     public StateMachine<AI> StateMachine { get; protected set; }
-    public SightSensor Sensor;
-
+    public SightSensor Sensor { get; protected set; }
+    public bool Active = true;
+    
     [Header("AI Behaviour")]
-    public float ViewDistance = 6f;
-    public float FieldOfView = 30f;
-    public float ReactionTime = 5f;
+    public float ViewDistance = 6f; 
+    public float FieldOfView = 60f;
+    public float RotationRate = .2f;
+    public float RotationAngle = 20f;
+    public float ReactionTime = .75f;
 
     private void Start()
     {
         Sensor = gameObject.AddComponent<SightSensor>();
         Sensor.SetupSensor(ViewDistance, FieldOfView);
-
-        StateMachine = new StateMachine<AI>(this, new RotateState(.5f, 30f));
+		
+        StateMachine = new StateMachine<AI>(this, new RotateState(RotationRate, RotationAngle));
     }
 
     private void Update()
     {
-        if (Sensor.CanSeeTarget())
-        {
-            StateMachine.ChangeState(new LookAtState(Sensor.GetTarget(), ReactionTime));
-        }
-
-        StateMachine.Update();
+        if (Active)
+            StateMachine.Update();
     }
 
-    public void OnTargetFound(GameObject target)
+    public void OnSeeTarget()
     {
-        StateMachine.ChangeState(new ChaseState(target));
+        Debug.Log("[AI]." + name + " - What was that? I saw something...");
+        StateMachine.ChangeState(new LookAtState(ReactionTime));
     }
 
+    public void OnTargetFound()
+    {
+        Debug.Log("[AI]." + name + " - Found target! Now chasing the target.");
+        StateMachine.ChangeState(new ChaseState(Sensor.Target));
+    }
+	
     public void OnTargetLost()
     {
-        StateMachine.ChangeState(new RotateState());
+        Debug.Log("[AI]." + name + " - Lost target. Returning to default state.");
+        StateMachine.ChangeState(new RotateState(RotationRate, RotationAngle));
     }
-
 }
+

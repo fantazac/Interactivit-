@@ -6,16 +6,15 @@ public class RotateState : State<AI>
     private float _rotationAngle;
     private float timeElapsedSinceLastRotation;
 
-
-    public RotateState(float TimeBetweenRotations = 2f, float RotationAngle = 45f)
+    public RotateState(float timeBetweenRotations = 2f, float rotationAngle = 45f)
     {
-        _timeBetweenRotations = TimeBetweenRotations;
-        _rotationAngle = RotationAngle;
+        _timeBetweenRotations = timeBetweenRotations;
+        _rotationAngle = rotationAngle;
     }
     
     public override void EnterState(AI _owner)
     {
-        _owner.Sensor.ResetSensor();
+        Debug.Log("[State].RotateState (Owner: " + _owner + ") - Entering RotateState State.");
     }
 
     public override void ExitState(AI _owner)
@@ -25,6 +24,9 @@ public class RotateState : State<AI>
 
     public override void Update(AI _owner)
     {
+        if (_owner.Sensor.CanSeeTarget)
+            _owner.OnSeeTarget();
+        
         timeElapsedSinceLastRotation += Time.deltaTime;
         if (timeElapsedSinceLastRotation >= _timeBetweenRotations)
         {

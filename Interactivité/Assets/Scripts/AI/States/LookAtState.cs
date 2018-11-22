@@ -1,22 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LookAtState : State<AI>
 {
-	GameObject _target;
 	float _reactionTime;
 	float _currentAlertLevel;
 	
-	public LookAtState(GameObject target, float reactionTime)
+	public LookAtState(float reactionTime)
 	{
 		_reactionTime = reactionTime;
-		_target = target;
 	}
 	
 	public override void EnterState(AI _owner)
 	{
-		
+		Debug.Log("[State].LookAt (Owner: " + _owner + ") - Entering LookAt State.");
 	}
 
 	public override void ExitState(AI _owner)
@@ -26,37 +22,24 @@ public class LookAtState : State<AI>
 
 	public override void Update(AI _owner)
 	{
-		if (_target == null)
-			_owner.OnTargetLost();
-
-		RaycastHit hit;
-		bool canSeeTarget = false;
-		
-		if (Physics.Raycast(_owner.transform.position, _target.transform.position - _owner.transform.position, out hit))
+		if (_owner.Sensor.CanSeeTarget)
 		{
-			if (hit.collider.CompareTag(SensorManager._TagToLookFor))
-			{
-				canSeeTarget = true;
-			}
-		}
-		
-		Debug.DrawLine(_owner.transform.position, hit.point, canSeeTarget ? Color.green : Color.red);
-		// Handle reaction time
-		if (canSeeTarget)
-		{
-			_currentAlertLevel += canSeeTarget ? Time.deltaTime : -Time.deltaTime / 5f;
+			// Handle reaction time
+			_currentAlertLevel += Time.deltaTime;
 			if (_currentAlertLevel >= _reactionTime)
-			{
-				_owner.OnTargetFound(_target);
-			}
-			_currentAlertLevel = Mathf.Clamp(_currentAlertLevel, 0f, _reactionTime);
+				_owner.OnTargetFound();
 			
-			//todo fix
-			Debug.Log(_currentAlertLevel + " / " + _reactionTime);
+			// Rotate to target
+			Vector3 lookAtPosition = _owner.Sensor.Target.transform.position;
+			lookAtPosition.y = _owner.transform.position.y;
+			_owner.transform.LookAt(lookAtPosition);
 		}
-		
-		Vector3 LookAtPosition = _target.transform.position;
-		LookAtPosition.y = _owner.transform.position.y;
-		_owner.transform.LookAt(LookAtPosition);
+		else
+		{
+			// Handle reaction time
+			_currentAlertLevel -= Time.deltaTime / 5f;
+			if (_currentAlertLevel <= -.2f)
+				_owner.OnTargetLost();
+		}
 	}
 }

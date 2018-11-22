@@ -80,7 +80,7 @@ public class MainMenuManager : MonoBehaviour
     public void OnReceiveReadyFromServer()
     {
         playersReady++;
-        if(createdMap && playersReady == 2)
+        if (createdMap && playersReady == 2)
         {
             StaticObjects.CharacterNetworkManager.SendToServer_Start();
         }
@@ -98,6 +98,11 @@ public class MainMenuManager : MonoBehaviour
     private void OnNetworkConnectedToServer(bool createdMap)
     {
         this.createdMap = createdMap;
+        if (createdMap)
+        {
+            int random = Random.Range(1, 4);
+            PhotonNetwork.Instantiate("Map" + random, Vector3.zero, Quaternion.identity, 0);
+        }
         SpawnPlayer();
         state = MainMenuState.IN_ROOM;
     }

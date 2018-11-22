@@ -13,11 +13,15 @@ public class AI : MonoBehaviour
     public float RotationAngle = 20f;
     public float ReactionTime = .75f;
 
+    private Vector3 _defaultPosition;
+    
+
     private void Start()
     {
         Sensor = gameObject.AddComponent<SightSensor>();
         Sensor.SetupSensor(ViewDistance, FieldOfView);
-		
+
+        _defaultPosition = transform.position;
         StateMachine = new StateMachine<AI>(this, new RotateState(RotationRate, RotationAngle));
     }
 

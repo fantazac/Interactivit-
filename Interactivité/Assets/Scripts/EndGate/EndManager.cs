@@ -4,6 +4,9 @@ public class EndManager : MonoBehaviour
 {
     private Collider characterCollider;
 
+    public delegate void OnGameEndHandler();
+    public event OnGameEndHandler OnGameEnd;
+
     public void SetCharacter(GameObject character)
     {
         characterCollider = character.GetComponent<Collider>();
@@ -11,9 +14,9 @@ public class EndManager : MonoBehaviour
 
     private void OnTriggerEnter(Collider collider)
     {
-        if(collider == characterCollider)
+        if (collider == characterCollider && OnGameEnd != null)
         {
-            StaticObjects.GameController.EndGame();
+            OnGameEnd();
         }
     }
 }

@@ -14,6 +14,9 @@ public class GameController : MonoBehaviour
 
     private MainMenuState state;
 
+    private float timeBeforeGameStart;
+    private WaitForSeconds delayGameStart;
+
     private Vector3 spawn1;
     private Vector3 spawn2;
     private Vector3 end1;
@@ -32,6 +35,9 @@ public class GameController : MonoBehaviour
         spawn2 = new Vector3(21, 0.5f, 2);
         end1 = new Vector3(18.5f, 0.5f, 2);
         end2 = new Vector3(-18.5f, 0.5f, 2);
+
+        timeBeforeGameStart = 1;
+        delayGameStart = new WaitForSeconds(timeBeforeGameStart);
 
         characterParentPrefabPath = "CharacterTemplatePrefab/CharacterTemplate";
         endPrefabPath = "EndPrefab/End";
@@ -82,7 +88,7 @@ public class GameController : MonoBehaviour
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
                 GUILayout.Label("Waiting for the other player to be ready...");
                 break;
-            case MainMenuState.IN_COUNTDOWN:
+            case MainMenuState.IN_DELAY:
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
                 GUILayout.Label("GO!!!");
                 break;
@@ -103,30 +109,6 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void OnReceiveReadyFromServer()
-    {
-        playersReady++;
-        if (createdMap && playersReady == 2)
-        {
-            StaticObjects.CharacterNetworkManager.SendToServer_Start();
-        }
-    }
-
-    public void OnReceiveStartFromServer()
-    {
-        StartCoroutine(Countdown());
-    }
-
-    private IEnumerator Countdown()
-    {
-        state = MainMenuState.IN_COUNTDOWN;
-
-        yield return new WaitForSeconds(1);
-
-        state = MainMenuState.IN_GAME;
-        StaticObjects.CharacterNetworkManager.gameObject.AddComponent<InputManager>();
-    }
-
     private void OnNetworkConnectedToServer(bool createdMap)
     {
         this.createdMap = createdMap;
@@ -141,17 +123,42 @@ public class GameController : MonoBehaviour
 
     private void SpawnPlayer()
     {
-        GameObject characterTemplate = Instantiate(characterParentPrefab);
-        GameObject character;
-        character = PhotonNetwork.Instantiate("Character" + (createdMap ? 1 : 2), createdMap ? spawn1 : spawn2, Quaternion.identity, 0);
+        GameObject character = PhotonNetwork.Instantiate("Character" + (createdMap ? 1 : 2), createdMap ? spawn1 : spawn2, Quaternion.identity, 0);
         StaticObjects.CharacterNetworkManager = character.GetComponent<CharacterNetworkManager>();
-        Instantiate(endPrefab, createdMap ? end1 : end2, Quaternion.identity).GetComponent<EndManager>().SetCharacter(character);
-        character.transform.parent = characterTemplate.transform;
+        character.transform.parent = Instantiate(characterParentPrefab).transform;
+
+        EndManager endManager = Instantiate(endPrefab, createdMap ? end1 : end2, Quaternion.identity).GetComponent<EndManager>();
+        endManager.SetCharacter(character);
+        endManager.OnGameEnd += OnGameEnd;
 
         mainMenuCamera.SetActive(false);
     }
 
-    public void EndGame()
+    public void OnReceiveReadyFromServer()
+    {
+        playersReady++;
+        if (createdMap && playersReady == 2)
+        {
+            StaticObjects.CharacterNetworkManager.SendToServer_Start();
+        }
+    }
+
+    public void OnReceiveStartFromServer()
+    {
+        StartCoroutine(GameStartDelay());
+    }
+
+    private IEnumerator GameStartDelay()
+    {
+        state = MainMenuState.IN_DELAY;
+
+        yield return delayGameStart;
+
+        state = MainMenuState.IN_GAME;
+        StaticObjects.CharacterNetworkManager.gameObject.AddComponent<InputManager>();
+    }
+
+    private void OnGameEnd()
     {
         StaticObjects.CharacterNetworkManager.SendToServer_End(createdMap);
     }
@@ -171,7 +178,7 @@ enum MainMenuState
     CONNECTING,
     IN_ROOM,
     READY_TO_PLAY,
-    IN_COUNTDOWN,
+    IN_DELAY,
     IN_GAME,
     END,
 }

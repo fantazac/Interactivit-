@@ -12,6 +12,9 @@ public class GameController : MonoBehaviour
     private string endPrefabPath;
     private GameObject endPrefab;
 
+    private string patrolPrefabPath;
+    private GameObject patrolPrefab;
+
     private MainMenuState state;
 
     private float timeBeforeGameStart;
@@ -31,16 +34,17 @@ public class GameController : MonoBehaviour
 
     private GameController()
     {
-        spawn1 = new Vector3(-21, 0.5f, 2);
-        spawn2 = new Vector3(21, 0.5f, 2);
-        end1 = new Vector3(18.5f, 0.5f, 2);
-        end2 = new Vector3(-18.5f, 0.5f, 2);
+        spawn1 = new Vector3(-21, 1.5f, 2);
+        spawn2 = new Vector3(21, 1.5f, 2);
+        end1 = new Vector3(18.5f, 1.5f, 2);
+        end2 = new Vector3(-18.5f, 1.5f, 2);
 
         timeBeforeGameStart = 1;
         delayGameStart = new WaitForSeconds(timeBeforeGameStart);
 
         characterParentPrefabPath = "CharacterTemplatePrefab/CharacterTemplate";
         endPrefabPath = "EndPrefab/End";
+        patrolPrefabPath = "BadGuy Patrol";
     }
 
     private void Start()
@@ -53,6 +57,7 @@ public class GameController : MonoBehaviour
 
         characterParentPrefab = Resources.Load<GameObject>(characterParentPrefabPath);
         endPrefab = Resources.Load<GameObject>(endPrefabPath);
+        patrolPrefab = Resources.Load<GameObject>(patrolPrefabPath);
     }
 
     private void OnGUI()
@@ -118,6 +123,7 @@ public class GameController : MonoBehaviour
             PhotonNetwork.Instantiate("Map" + random, Vector3.zero, Quaternion.identity, 0);
         }
         SpawnPlayer();
+        Instantiate(patrolPrefab, Vector3.forward * 2, Quaternion.identity);
         state = MainMenuState.IN_ROOM;
     }
 

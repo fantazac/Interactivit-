@@ -2,36 +2,33 @@
 
 public class RotateState : State<AI>
 {
-    private float _timeBetweenRotations;
-    private float _rotationAngle;
+    private float timeBetweenRotations;
+    private float rotationAngle;
     private float timeElapsedSinceLastRotation;
 
-    public RotateState(float timeBetweenRotations = 2f, float rotationAngle = 45f)
+    public RotateState(float timeBetweenRotations = 2, float rotationAngle = 45)
     {
-        _timeBetweenRotations = timeBetweenRotations;
-        _rotationAngle = rotationAngle;
-    }
-    
-    public override void EnterState(AI _owner)
-    {
-        Debug.Log("[State].RotateState (Owner: " + _owner + ") - Entering RotateState State.");
+        this.timeBetweenRotations = timeBetweenRotations;
+        this.rotationAngle = rotationAngle;
     }
 
-    public override void ExitState(AI _owner)
+    public override void EnterState(AI owner)
     {
-        
+        Debug.Log("[State].RotateState (Owner: " + owner + ") - Entering RotateState State.");
     }
 
-    public override void Update(AI _owner)
+    public override void UpdateState(AI owner)
     {
-        if (_owner.Sensor.CanSeeTarget)
-            _owner.OnSeeTarget();
-        
-        timeElapsedSinceLastRotation += Time.deltaTime;
-        if (timeElapsedSinceLastRotation >= _timeBetweenRotations)
+        if (owner.Sensor.CanSeeTarget)
         {
-            timeElapsedSinceLastRotation -= _timeBetweenRotations;
-            _owner.transform.Rotate(0f, _rotationAngle, 0f);
+            owner.OnSeeTarget();
+        }
+
+        timeElapsedSinceLastRotation += Time.deltaTime;
+        if (timeElapsedSinceLastRotation >= timeBetweenRotations)
+        {
+            timeElapsedSinceLastRotation -= timeBetweenRotations;
+            owner.transform.Rotate(0, rotationAngle, 0);
         }
     }
 }

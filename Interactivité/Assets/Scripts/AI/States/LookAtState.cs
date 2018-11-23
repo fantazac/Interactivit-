@@ -2,44 +2,53 @@
 
 public class LookAtState : State<AI>
 {
-	float _reactionTime;
-	float _currentAlertLevel;
-	
-	public LookAtState(float reactionTime)
-	{
-		_reactionTime = reactionTime;
-	}
-	
-	public override void EnterState(AI _owner)
-	{
-		Debug.Log("[State].LookAt (Owner: " + _owner + ") - Entering LookAt State.");
-	}
+    private float reactionTime;
+    private float currentAlertLevel;
 
-	public override void ExitState(AI _owner)
-	{
-		
-	}
+    public LookAtState(float reactionTime)
+    {
+        this.reactionTime = reactionTime;
+    }
 
-	public override void Update(AI _owner)
-	{
-		if (_owner.Sensor.CanSeeTarget)
-		{
-			// Handle reaction time
-			_currentAlertLevel += Time.deltaTime;
-			if (_currentAlertLevel >= _reactionTime)
-				_owner.OnTargetFound();
-			
-			// Rotate to target
-			Vector3 lookAtPosition = _owner.Sensor.Target.transform.position;
-			lookAtPosition.y = _owner.transform.position.y;
-			_owner.transform.LookAt(lookAtPosition);
-		}
-		else
-		{
-			// Handle reaction time
-			_currentAlertLevel -= Time.deltaTime / 5f;
-			if (_currentAlertLevel <= -.2f)
-				_owner.OnTargetLost();
-		}
-	}
+    public override void EnterState(AI owner)
+    {
+        Debug.Log("[State].LookAt (Owner: " + owner + ") - Entering LookAt State.");
+    }
+
+    public override void UpdateState(AI owner)
+    {
+        bool canSeeTarget = owner.Sensor.CanSeeTarget;
+        HandleReactionTime(owner, canSeeTarget);
+        if (canSeeTarget)
+        {
+            RotateTowardsTarget(owner);
+        }
+    }
+
+    private void HandleReactionTime(AI owner, bool canSeeTarget)
+    {
+        if (canSeeTarget)
+        {
+            currentAlertLevel += Time.deltaTime;
+            if (currentAlertLevel >= reactionTime)
+            {
+                owner.OnTargetFound();
+            }
+        }
+        else
+        {
+            currentAlertLevel -= Time.deltaTime * 0.2f;
+            if (currentAlertLevel <= -0.2f)
+            {
+                owner.OnTargetLost();
+            }
+        }
+    }
+
+    private void RotateTowardsTarget(AI owner)
+    {
+        Vector3 lookAtPosition = owner.Sensor.Target.transform.position;
+        lookAtPosition.y = owner.transform.position.y;
+        owner.transform.LookAt(lookAtPosition);
+    }
 }

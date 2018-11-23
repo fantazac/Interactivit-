@@ -242,7 +242,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75d11c89430e5ee4796c2de9a659e804, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Active: 1
   ViewDistance: 10
   FieldOfView: 60
   ReactionTime: 0.75
@@ -278,7 +277,7 @@ CapsuleCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1722232220514568}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2

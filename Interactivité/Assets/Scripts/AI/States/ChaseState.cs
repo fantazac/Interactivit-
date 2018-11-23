@@ -11,7 +11,7 @@ public class ChaseState : State<AI>
 
     public override void EnterState(AI owner)
     {
-        owner.NMA.speed = 10;
+        owner.NMA.speed = 5;
         owner.NMA.angularSpeed = 1000;
         owner.NMA.acceleration = 50;
 

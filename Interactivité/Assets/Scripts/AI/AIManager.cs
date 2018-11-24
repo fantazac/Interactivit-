@@ -1,46 +1,51 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class AIManager : MonoBehaviour
 {
-    public static AIManager Instance { get; protected set; }
+    public Transform[] Targets { get; protected set; }
+
+    private List<AI> ais;
 
     [SerializeField]
-    Transform[] spawnpoint;
+    private Transform[] spawnPoint;
 
     [SerializeField]
-    Behaviour behaviourHard;
+    private Behaviour behaviourHard;
 
     private void Start()
     {
-        if (!Instance)
-        {
-            Instance = this;
-        }
+        StaticObjects.AIManager = this;
     }
 
-    public static void SpawnAIs(bool hardMode)
+    public void SpawnAIs(bool hardMode)
     {
-        if (!Instance)
+        ais = new List<AI>();
+        for (int i = 0; i < spawnPoint.Length; i++)
         {
-            return;
-        }
-
-        for (int i = 0; i < Instance.spawnpoint.Length; i++)
-        {
-            Instance.CreateAIInstance(Instance.spawnpoint[i].position, hardMode);
+            CreateAIInstance(spawnPoint[i].position, hardMode);
         }
     }
 
     private void CreateAIInstance(Vector3 position, bool hardMode)
     {
         Debug.Log("Spawning AI Pawn at " + position);
-        if (hardMode)
+        ais.Add(PhotonNetwork.Instantiate("BadGuy_" + (hardMode ? "Hard" : "Easy"), position, Quaternion.identity, 0).GetComponent<AI>());
+    }
+
+    public void GetTargets()
+    {
+        CharacterNetworkManager[] players = FindObjectsOfType<CharacterNetworkManager>();
+        Targets = new Transform[players.Length];
+
+        for (int i = 0; i < players.Length; i++)
         {
-            PhotonNetwork.Instantiate("BadGuy_Hard", position, Quaternion.identity, 0);
+            Targets[i] = players[i].transform;
         }
-        else
+
+        for (int i = 0; i < ais.Count; i++)
         {
-            PhotonNetwork.Instantiate("BadGuy_Easy", position, Quaternion.identity, 0);
+            ais[i].ShouldLookForTargets = true;
         }
     }
 }

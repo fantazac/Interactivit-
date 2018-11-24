@@ -12,9 +12,6 @@ public class GameController : MonoBehaviour
     private string endPrefabPath;
     private GameObject endPrefab;
 
-    private string patrolPrefabPath;
-    private GameObject patrolPrefab;
-
     private MainMenuState state;
 
     private float timeBeforeGameStart;
@@ -44,7 +41,6 @@ public class GameController : MonoBehaviour
 
         characterParentPrefabPath = "CharacterTemplatePrefab/CharacterTemplate";
         endPrefabPath = "EndPrefab/End";
-        patrolPrefabPath = "BadGuy Patrol";
     }
 
     private void Start()
@@ -57,7 +53,6 @@ public class GameController : MonoBehaviour
 
         characterParentPrefab = Resources.Load<GameObject>(characterParentPrefabPath);
         endPrefab = Resources.Load<GameObject>(endPrefabPath);
-        patrolPrefab = Resources.Load<GameObject>(patrolPrefabPath);
     }
 
     private void OnGUI()
@@ -77,11 +72,11 @@ public class GameController : MonoBehaviour
             case MainMenuState.AI_SPAWN:
                 if (GUILayout.Button("Easy", GUILayout.Height(40)))
                 {
-                    AIManager.SpawnAIs(false);
+                    StaticObjects.AIManager.SpawnAIs(false);
                 }
                 if (GUILayout.Button("Hard", GUILayout.Height(40)))
                 {
-                    AIManager.SpawnAIs(true);
+                    StaticObjects.AIManager.SpawnAIs(true);
                 }
                 break;
             case MainMenuState.IN_ROOM:
@@ -155,7 +150,7 @@ public class GameController : MonoBehaviour
         playersReady++;
         if (playersReady == 1)
         {
-            //call method didier
+            StaticObjects.AIManager.GetTargets();
         }
         if (createdMap && playersReady == 2)
         {

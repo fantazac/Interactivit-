@@ -8,21 +8,41 @@ public class SightSensor : MonoBehaviour
     public float ViewDistance = 16;
     public float FieldOfView = 60;
 
+    private AI owner;
+    private Transform preferedTarget;
+    private Transform tmpTarget;
+    private bool hasSeenTargetThisFrame;
+
     #region Monobehaviour Callbacks
 
     private void Start()
     {
-        Target = StaticObjects.CharacterNetworkManager.gameObject;
+        owner = GetComponent<AI>();
     }
 
     private void Update()
     {
-        CanSeeTarget = TargetIsInSight();
+        if (!owner.ShouldLookForTargets)
+            return;
 
-        if (CanSeeTarget)
+        hasSeenTargetThisFrame = false;
+        Transform[] targetTransforms = StaticObjects.AIManager.Targets;
+        for (int index = 0; index < targetTransforms.Length; index++)
         {
-            Debug.DrawLine(transform.position, Target.transform.position, Color.cyan);
+            tmpTarget = targetTransforms[index];
+
+            if (TargetIsInSight())
+            {
+                if (!hasSeenTargetThisFrame)
+                {
+                    Target = tmpTarget.gameObject;
+                    hasSeenTargetThisFrame = true;
+                }
+                else if ((transform.position - tmpTarget.position).magnitude < (transform.position - Target.transform.position).magnitude)
+                    Target = tmpTarget.gameObject;
+            }
         }
+        CanSeeTarget = hasSeenTargetThisFrame;
 
         // Debug draw sight range
         Debug.DrawLine(transform.position, transform.position + transform.rotation * Quaternion.Euler(0f, FieldOfView / 2f, 0f) * Vector3.forward * ViewDistance, Color.green);
@@ -39,22 +59,22 @@ public class SightSensor : MonoBehaviour
 
     private bool TargetIsInSight()
     {
-        return Target != null && TargetIsInViewDistance() && TargetIsInFieldOfView() && TargetIsDirectlyInSight();
+        return tmpTarget != null && TargetIsInViewDistance() && TargetIsInFieldOfView() && TargetIsDirectlyInSight();
     }
 
     private bool TargetIsInViewDistance()
     {
-        return (transform.position - Target.transform.position).magnitude <= ViewDistance;
+        return (transform.position - tmpTarget.position).magnitude <= ViewDistance;
     }
 
     private bool TargetIsInFieldOfView()
     {
-        return Vector3.Angle(Target.transform.position - transform.position, transform.forward) <= FieldOfView * 0.5f;
+        return Vector3.Angle(tmpTarget.position - transform.position, transform.forward) <= FieldOfView * 0.5f;
     }
 
     private bool TargetIsDirectlyInSight()
     {
         RaycastHit hit;
-        return Physics.Raycast(transform.position, Target.transform.position - transform.position, out hit) && hit.collider.gameObject == Target;
+        return Physics.Raycast(transform.position, tmpTarget.position - transform.position, out hit) && hit.collider.gameObject == tmpTarget.gameObject;
     }
 }

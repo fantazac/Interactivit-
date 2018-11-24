@@ -1,43 +1,46 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class AIManager : MonoBehaviour
 {
-	public static AIManager Instance { get; protected set; }
+    public static AIManager Instance { get; protected set; }
 
-	[SerializeField] Transform[] spawnpoint;
-	[SerializeField] GameObject pawnPrefab;
-	[SerializeField] Behaviour behaviourHard;
+    [SerializeField]
+    Transform[] spawnpoint;
 
-	private void Start()
-	{
-		if (!Instance)
-			Instance = this;
-	}
+    [SerializeField]
+    Behaviour behaviourHard;
 
-	public static void SpawnAIs(bool difficultMode)
-	{
-		if (!Instance)
-			return;
+    private void Start()
+    {
+        if (!Instance)
+        {
+            Instance = this;
+        }
+    }
 
-		for (int index = 0; index < Instance.spawnpoint.Length; index++)
-		{
-			Instance.CreateAIInstance(Instance.spawnpoint[index].position, difficultMode);
-		}
-	}
+    public static void SpawnAIs(bool hardMode)
+    {
+        if (!Instance)
+        {
+            return;
+        }
 
-	private void CreateAIInstance(Vector3 position, bool difficultMode)
-	{
-		Debug.Log("Spawning AI Pawn at " + position);
-		
-		GameObject pawn = Instantiate(pawnPrefab, position, Quaternion.identity);
-		AI ai = pawn.GetComponent<AI>();
-		
-		if (difficultMode)
-		{
-			ai.SetBehaviour(behaviourHard);
-			ai.ReactionTime = .3f;
-		}
-	}
+        for (int i = 0; i < Instance.spawnpoint.Length; i++)
+        {
+            Instance.CreateAIInstance(Instance.spawnpoint[i].position, hardMode);
+        }
+    }
+
+    private void CreateAIInstance(Vector3 position, bool hardMode)
+    {
+        Debug.Log("Spawning AI Pawn at " + position);
+        if (hardMode)
+        {
+            PhotonNetwork.Instantiate("BadGuy_Hard", position, Quaternion.identity, 0);
+        }
+        else
+        {
+            PhotonNetwork.Instantiate("BadGuy_Easy", position, Quaternion.identity, 0);
+        }
+    }
 }

@@ -77,11 +77,11 @@ public class GameController : MonoBehaviour
             case MainMenuState.AI_SPAWN:
                 if (GUILayout.Button("Easy", GUILayout.Height(40)))
                 {
-                    SpawnAIs(false);
+                    AIManager.SpawnAIs(false);
                 }
                 if (GUILayout.Button("Hard", GUILayout.Height(40)))
                 {
-                    SpawnAIs(true);
+                    AIManager.SpawnAIs(true);
                 }
                 break;
             case MainMenuState.IN_ROOM:
@@ -137,11 +137,6 @@ public class GameController : MonoBehaviour
         state = createdMap ? MainMenuState.AI_SPAWN : MainMenuState.IN_ROOM;
     }
 
-    private void SpawnAIs(bool hardMode)
-    {
-        AIManager.SpawnAIs(hardMode);
-    }
-
     private void SpawnPlayer()
     {
         GameObject character = PhotonNetwork.Instantiate("Character" + (createdMap ? 1 : 2), createdMap ? spawn1 : spawn2, Quaternion.identity, 0);
@@ -158,6 +153,10 @@ public class GameController : MonoBehaviour
     public void OnReceiveReadyFromServer()
     {
         playersReady++;
+        if (playersReady == 1)
+        {
+            //call method didier
+        }
         if (createdMap && playersReady == 2)
         {
             StaticObjects.CharacterNetworkManager.SendToServer_Start();

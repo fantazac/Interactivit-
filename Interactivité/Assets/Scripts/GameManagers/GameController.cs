@@ -74,6 +74,16 @@ public class GameController : MonoBehaviour
             case MainMenuState.CONNECTING:
                 GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
                 break;
+            case MainMenuState.AI_SPAWN:
+                if (GUILayout.Button("Easy", GUILayout.Height(40)))
+                {
+                    SpawnAIs(false);
+                }
+                if (GUILayout.Button("Hard", GUILayout.Height(40)))
+                {
+                    SpawnAIs(true);
+                }
+                break;
             case MainMenuState.IN_ROOM:
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
                 if (PhotonNetwork.playerList.Length == 2)
@@ -123,11 +133,13 @@ public class GameController : MonoBehaviour
             PhotonNetwork.Instantiate("Map" + random, Vector3.zero, Quaternion.identity, 0);
         }
         SpawnPlayer();
-        
-        //Instantiate(patrolPrefab, Vector3.forward * 2, Quaternion.identity);
-        AIManager.SpawnAIs(false);
-        
-        state = MainMenuState.IN_ROOM;
+
+        state = createdMap ? MainMenuState.AI_SPAWN : MainMenuState.IN_ROOM;
+    }
+
+    private void SpawnAIs(bool hardMode)
+    {
+        AIManager.SpawnAIs(hardMode);
     }
 
     private void SpawnPlayer()
@@ -185,6 +197,7 @@ enum MainMenuState
 {
     MAIN,
     CONNECTING,
+    AI_SPAWN,
     IN_ROOM,
     READY_TO_PLAY,
     IN_DELAY,

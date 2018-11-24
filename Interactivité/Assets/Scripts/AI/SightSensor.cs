@@ -75,6 +75,14 @@ public class SightSensor : MonoBehaviour
     private bool TargetIsDirectlyInSight()
     {
         RaycastHit hit;
-        return Physics.Raycast(transform.position, tmpTarget.position - transform.position, out hit) && hit.collider.gameObject == tmpTarget.gameObject;
+        if (Physics.Raycast(transform.position, tmpTarget.position - transform.position, out hit))
+        {
+            if (hit.collider.gameObject == tmpTarget.gameObject)
+                return true;
+            if (hit.collider.gameObject.CompareTag("InvisibleWall"))
+                owner.OnTargetLost();
+        }
+
+        return false;
     }
 }

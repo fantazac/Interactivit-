@@ -11,6 +11,8 @@ public class CharacterMovement : MonoBehaviour
 
     private CharacterNetworkManager characterNetworkManager;
 
+    private Vector3 spawn;
+
     private CharacterMovement()
     {
         movementSpeed = 5;
@@ -18,6 +20,8 @@ public class CharacterMovement : MonoBehaviour
 
     private void Start()
     {
+        spawn = transform.position;
+
         characterNetworkManager = GetComponent<CharacterNetworkManager>();
     }
 
@@ -87,6 +91,11 @@ public class CharacterMovement : MonoBehaviour
     public void OnReceiveMoveDownFromServer(bool moveDown)
     {
         this.moveDown = moveDown;
+    }
+
+    public void OnReceiveBackToSpawn()
+    {
+        transform.position = spawn;
     }
 
     public void StopAllMovement()

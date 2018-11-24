@@ -11,9 +11,21 @@ public class NetworkConnectionManager : MonoBehaviour
         mainMenuManager.OnConnectingToServer += OnConnectingToServer;
     }
 
-    private void OnConnectingToServer()
+    private void OnConnectingToServer(bool offline)
     {
-        Connect();
+        if (offline)
+        {
+            PhotonNetwork.offlineMode = true;
+        }
+        else
+        {
+            Connect();
+        }
+    }
+
+    private void OnConnectedToMaster()
+    {
+        OnPhotonRandomJoinFailed();
     }
 
     private void Connect()

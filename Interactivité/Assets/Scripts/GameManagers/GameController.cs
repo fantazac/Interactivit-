@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour
     private bool createdMap;
     private bool isWinner;
 
-    public delegate void OnConnectingToServerHandler();
+    public delegate void OnConnectingToServerHandler(bool offline);
     public event OnConnectingToServerHandler OnConnectingToServer;
 
     private GameController()
@@ -60,10 +60,15 @@ public class GameController : MonoBehaviour
         switch (state)
         {
             case MainMenuState.MAIN:
-                if (GUILayout.Button("Connect", GUILayout.Height(40)))
+                if (GUILayout.Button("Single player", GUILayout.Height(40)))
                 {
                     state = MainMenuState.CONNECTING;
-                    OnConnectingToServer();
+                    OnConnectingToServer(true);
+                }
+                if (GUILayout.Button("Multiplayer", GUILayout.Height(40)))
+                {
+                    state = MainMenuState.CONNECTING;
+                    OnConnectingToServer(false);
                 }
                 break;
             case MainMenuState.CONNECTING:
@@ -83,7 +88,7 @@ public class GameController : MonoBehaviour
                 break;
             case MainMenuState.IN_ROOM:
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
-                if (PhotonNetwork.playerList.Length == 2)
+                if (PhotonNetwork.playerList.Length == 2 || PhotonNetwork.offlineMode)
                 {
                     if (GUILayout.Button("Ready to play!", GUILayout.Height(40)))
                     {
@@ -154,7 +159,7 @@ public class GameController : MonoBehaviour
         {
             StaticObjects.AIManager.GetTargets();
         }
-        if (createdMap && playersReady == 2)
+        if (createdMap && playersReady == 2 || PhotonNetwork.offlineMode)
         {
             StaticObjects.CharacterNetworkManager.SendToServer_Start();
         }

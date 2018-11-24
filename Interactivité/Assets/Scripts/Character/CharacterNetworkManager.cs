@@ -77,6 +77,17 @@ public class CharacterNetworkManager : MonoBehaviour
         characterMovement.OnReceiveMoveDownFromServer(moveDown);
     }
 
+    public void SendToServer_BackToSpawn()
+    {
+        photonView.RPC("ReceiveFromServer_BackToSpawn", PhotonTargets.AllViaServer);
+    }
+
+    [PunRPC]
+    private void ReceiveFromServer_BackToSpawn()
+    {
+        characterMovement.OnReceiveBackToSpawn();
+    }
+
     public void SendToServer_End(bool createdMap)
     {
         photonView.RPC("ReceiveFromServer_End", PhotonTargets.AllViaServer, createdMap);

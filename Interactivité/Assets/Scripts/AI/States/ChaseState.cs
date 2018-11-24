@@ -28,12 +28,11 @@ public class ChaseState : State<AI>
 
         owner.NMA.destination = target.transform.position;
 
-        if (Vector3.Distance(owner.transform.position, target.transform.position) <= .8f)
+        if (Vector3.Distance(owner.transform.position, target.transform.position) <= 0.8f)
         {
-            // todo Respawn player
-            owner.OnTargetLost();
+            target.GetComponent<CharacterNetworkManager>().SendToServer_BackToSpawn();
+            target = null;
+            owner.DefaultState();
         }
-
-        Debug.DrawLine(owner.transform.position, target.transform.position, Color.cyan);
     }
 }

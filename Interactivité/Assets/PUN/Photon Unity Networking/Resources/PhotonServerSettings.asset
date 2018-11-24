@@ -44,4 +44,5 @@ MonoBehaviour:
   - ReceiveFromServer_MoveRight
   - ReceiveFromServer_MoveUp
   - ReceiveFromServer_End
+  - ReceiveFromServer_BackToSpawn
   DisableAutoOpenWizard: 1

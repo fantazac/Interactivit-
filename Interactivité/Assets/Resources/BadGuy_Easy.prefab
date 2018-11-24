@@ -61,7 +61,7 @@ GameObject:
   - component: {fileID: 114075782502765776}
   - component: {fileID: 195081294999050842}
   m_Layer: 0
-  m_Name: BadGuy
+  m_Name: BadGuy_Easy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

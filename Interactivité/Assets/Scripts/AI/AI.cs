@@ -6,6 +6,7 @@ public class AI : MonoBehaviour
     public StateMachine<AI> StateMachine { get; protected set; }
     public SightSensor Sensor { get; protected set; }
     public NavMeshAgent NMA { get; protected set; }
+    public bool ShouldLookForTargets { get; set; }
 
     [Header("AI Behaviour")]
     public float ViewDistance = 6;

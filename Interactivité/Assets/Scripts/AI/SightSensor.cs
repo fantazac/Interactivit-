@@ -78,9 +78,13 @@ public class SightSensor : MonoBehaviour
         if (Physics.Raycast(transform.position, tmpTarget.position - transform.position, out hit))
         {
             if (hit.collider.gameObject == tmpTarget.gameObject)
+            {
                 return true;
+            }
             if (hit.collider.gameObject.CompareTag("InvisibleWall"))
+            {
                 owner.OnTargetLost();
+            }
         }
 
         return false;

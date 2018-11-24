@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class InputManager : MonoBehaviour
+public abstract class InputManager : MonoBehaviour
 {
     public delegate void OnMoveUpHandler(bool move);
     public event OnMoveUpHandler OnMoveUp;
@@ -21,40 +21,49 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.W))
+        if (MoveUpKeyIsDown())
         {
             OnMoveUp(true);
         }
-        else if (Input.GetKeyUp(KeyCode.W))
+        else if (MoveUpKeyIsUp())
         {
             OnMoveUp(false);
         }
 
-        if (Input.GetKeyDown(KeyCode.A))
+        if (MoveLeftKeyIsDown())
         {
             OnMoveLeft(true);
         }
-        else if (Input.GetKeyUp(KeyCode.A))
+        else if (MoveLeftKeyIsUp())
         {
             OnMoveLeft(false);
         }
 
-        if (Input.GetKeyDown(KeyCode.S))
+        if (MoveDownKeyIsDown())
         {
             OnMoveDown(true);
         }
-        else if (Input.GetKeyUp(KeyCode.S))
+        else if (MoveDownKeyIsUp())
         {
             OnMoveDown(false);
         }
 
-        if (Input.GetKeyDown(KeyCode.D))
+        if (MoveRightKeyIsDown())
         {
             OnMoveRight(true);
         }
-        else if (Input.GetKeyUp(KeyCode.D))
+        else if (MoveRightKeyIsUp())
         {
             OnMoveRight(false);
         }
     }
+
+    protected abstract bool MoveUpKeyIsDown();
+    protected abstract bool MoveDownKeyIsDown();
+    protected abstract bool MoveLeftKeyIsDown();
+    protected abstract bool MoveRightKeyIsDown();
+    protected abstract bool MoveUpKeyIsUp();
+    protected abstract bool MoveDownKeyIsUp();
+    protected abstract bool MoveLeftKeyIsUp();
+    protected abstract bool MoveRightKeyIsUp();
 }

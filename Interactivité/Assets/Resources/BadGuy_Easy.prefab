@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4498320721531268}
   - component: {fileID: 33159914825881506}
-  - component: {fileID: 135917848237900378}
   - component: {fileID: 23535013577639616}
   m_Layer: 0
   m_Name: Left Eye
@@ -38,7 +37,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4386007320082070}
   - component: {fileID: 33649122467956998}
-  - component: {fileID: 135176685325243812}
   - component: {fileID: 23134896353863494}
   m_Layer: 0
   m_Name: Right Eye
@@ -60,7 +58,8 @@ GameObject:
   - component: {fileID: 23762929964905422}
   - component: {fileID: 114075782502765776}
   - component: {fileID: 195081294999050842}
-  m_Layer: 0
+  - component: {fileID: 114546665874647288}
+  m_Layer: 9
   m_Name: BadGuy_Easy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -246,30 +245,32 @@ MonoBehaviour:
   FieldOfView: 60
   ReactionTime: 0.8
   DefaultBehaviour: {fileID: 11400000, guid: 32519f226326321449a36d3eeeb4d2ce, type: 2}
---- !u!135 &135176685325243812
-SphereCollider:
+--- !u!114 &114546665874647288
+MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1524288145234970}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_GameObject: {fileID: 1722232220514568}
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &135917848237900378
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1343316898190810}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  OwnerShipWasTransfered: 0
+  prefixBackup: -1
+  synchronization: 0
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 0}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 0
+  instantiationId: -1
+  currentMasterID: -1
+  isRuntimeInstantiated: 0
 --- !u!136 &136319289778055790
 CapsuleCollider:
   m_ObjectHideFlags: 1

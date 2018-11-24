@@ -73,10 +73,12 @@ public class GameController : MonoBehaviour
                 if (GUILayout.Button("Easy", GUILayout.Height(40)))
                 {
                     StaticObjects.AIManager.SpawnAIs(false);
+                    state = MainMenuState.IN_ROOM;
                 }
                 if (GUILayout.Button("Hard", GUILayout.Height(40)))
                 {
                     StaticObjects.AIManager.SpawnAIs(true);
+                    state = MainMenuState.IN_ROOM;
                 }
                 break;
             case MainMenuState.IN_ROOM:

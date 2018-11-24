@@ -31,6 +31,13 @@ public class AI : MonoBehaviour
         StateMachine.UpdateStateMachine();
     }
 
+    public void SetBehaviour(Behaviour behaviour)
+    {
+        DefaultBehaviour = behaviour;
+        if (StateMachine == null || NMA == null)
+            Start();
+        DefaultState();
+    }
 
     public void DefaultState()
     {

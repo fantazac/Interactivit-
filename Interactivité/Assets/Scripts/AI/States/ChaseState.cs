@@ -11,7 +11,7 @@ public class ChaseState : State<AI>
 
     public override void EnterState(AI owner)
     {
-        owner.NMA.speed = 5;
+        owner.NMA.speed = 8;
         owner.NMA.angularSpeed = 1000;
         owner.NMA.acceleration = 50;
 
@@ -28,10 +28,10 @@ public class ChaseState : State<AI>
 
         owner.NMA.destination = target.transform.position;
 
-        if (Vector3.Distance(owner.transform.position, target.transform.position) <= 0.5f)
+        if (Vector3.Distance(owner.transform.position, target.transform.position) <= .8f)
         {
             // todo Respawn player
-            owner.DefaultState();
+            owner.OnTargetLost();
         }
 
         Debug.DrawLine(owner.transform.position, target.transform.position, Color.cyan);

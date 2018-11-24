@@ -123,7 +123,10 @@ public class GameController : MonoBehaviour
             PhotonNetwork.Instantiate("Map" + random, Vector3.zero, Quaternion.identity, 0);
         }
         SpawnPlayer();
-        Instantiate(patrolPrefab, Vector3.forward * 2, Quaternion.identity);
+        
+        //Instantiate(patrolPrefab, Vector3.forward * 2, Quaternion.identity);
+        AIManager.SpawnAIs(true);
+        
         state = MainMenuState.IN_ROOM;
     }
 

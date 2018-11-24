@@ -2,14 +2,12 @@
 
 public class RotateState : State<AI>
 {
-    private float timeBetweenRotations;
-    private float rotationAngle;
+    private float rotationSpeed;
     private float timeElapsedSinceLastRotation;
 
-    public RotateState(float timeBetweenRotations = 2, float rotationAngle = 45)
+    public RotateState(float rotationSpeed = 45, float maxModifierOffset = 20f)
     {
-        this.timeBetweenRotations = timeBetweenRotations;
-        this.rotationAngle = rotationAngle;
+        this.rotationSpeed = rotationSpeed + Random.Range(-maxModifierOffset, maxModifierOffset);
     }
 
     public override void EnterState(AI owner)
@@ -23,12 +21,7 @@ public class RotateState : State<AI>
         {
             owner.OnSeeTarget();
         }
-
-        timeElapsedSinceLastRotation += Time.deltaTime;
-        if (timeElapsedSinceLastRotation >= timeBetweenRotations)
-        {
-            timeElapsedSinceLastRotation -= timeBetweenRotations;
-            owner.transform.Rotate(0, rotationAngle, 0);
-        }
+        
+        owner.transform.Rotate(0, rotationSpeed * Time.deltaTime, 0);
     }
 }

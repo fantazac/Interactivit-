@@ -37,7 +37,7 @@ public class LookAtState : State<AI>
         }
         else
         {
-            currentAlertLevel -= Time.deltaTime * 0.2f;
+            currentAlertLevel -= Time.deltaTime * 0.5f;
             if (currentAlertLevel <= -0.2f)
             {
                 owner.OnTargetLost();

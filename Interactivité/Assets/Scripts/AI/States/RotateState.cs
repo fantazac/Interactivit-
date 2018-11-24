@@ -8,6 +8,7 @@ public class RotateState : State<AI>
     public RotateState(float rotationSpeed = 45, float maxModifierOffset = 20f)
     {
         this.rotationSpeed = rotationSpeed + Random.Range(-maxModifierOffset, maxModifierOffset);
+        this.rotationSpeed *= Random.value <= .5f ? 1 : -1;
     }
 
     public override void EnterState(AI owner)

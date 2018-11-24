@@ -125,7 +125,7 @@ public class GameController : MonoBehaviour
         SpawnPlayer();
         
         //Instantiate(patrolPrefab, Vector3.forward * 2, Quaternion.identity);
-        AIManager.SpawnAIs(true);
+        AIManager.SpawnAIs(false);
         
         state = MainMenuState.IN_ROOM;
     }

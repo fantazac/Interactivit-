@@ -45,4 +45,7 @@ MonoBehaviour:
   - ReceiveFromServer_MoveUp
   - ReceiveFromServer_End
   - ReceiveFromServer_BackToSpawn
+  - ReceiveFromServer_InitState
+  - ReceiveFromServer_TargetLost
+  - ReceiveFromServer_UpdateStateFromServer
   DisableAutoOpenWizard: 1

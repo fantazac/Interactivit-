@@ -2,24 +2,30 @@
 
 public class AINetworkManager : MonoBehaviour
 {
+    public AI ai;
     private PhotonView photonView;
-
-    public delegate void OnStartFromServerHandler();
-    public event OnStartFromServerHandler OnStartFromServer;
 
     private void Awake()
     {
-        photonView = GetComponent<PhotonView>();
+        if (!photonView)
+        {
+            ai = GetComponent<AI>();
+            photonView = GetComponent<PhotonView>();
+        }
     }
 
-    public void SendToServer_Ready()
+    public void SendToServer_UpdateStateFromServer(float value)
     {
-        photonView.RPC("ReceiveFromServer_Ready", PhotonTargets.AllViaServer);
+        if (!photonView)
+        {
+            Awake();
+        }
+        photonView.RPC("ReceiveFromServer_UpdateStateFromServer", PhotonTargets.AllBufferedViaServer, value);
     }
 
     [PunRPC]
-    private void ReceiveFromServer_Ready()
+    private void ReceiveFromServer_UpdateStateFromServer(float value)
     {
-        //OnReadyFromServer();
+        ai.StateMachine.CurrentState.UpdateStateFromServer(value);
     }
 }

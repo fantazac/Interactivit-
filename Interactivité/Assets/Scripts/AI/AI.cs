@@ -14,17 +14,20 @@ public class AI : MonoBehaviour
     public float ReactionTime = 0.75f;
     public Behaviour DefaultBehaviour;
 
+    private AINetworkManager anm;
+
     private Vector3 defaultPosition;
 
-    private void Start()
+    private void Awake()
     {
         Sensor = gameObject.AddComponent<SightSensor>();
         Sensor.SetupSensor(ViewDistance, FieldOfView);
 
-        NMA = gameObject.GetComponent<NavMeshAgent>();
+        NMA = GetComponent<NavMeshAgent>();
 
         defaultPosition = transform.position;
-        StateMachine = new StateMachine<AI>(this, DefaultBehaviour.GetDefaultBehaviour());
+        anm = GetComponent<AINetworkManager>();
+        StateMachine = new StateMachine<AI>(this, DefaultBehaviour.GetDefaultBehaviour(anm));
     }
 
     private void Update()
@@ -36,13 +39,15 @@ public class AI : MonoBehaviour
     {
         DefaultBehaviour = behaviour;
         if (StateMachine == null || NMA == null)
-            Start();
+        {
+            Awake();
+        }
         DefaultState();
     }
 
     public void DefaultState()
     {
-        StateMachine.ChangeState(DefaultBehaviour.GetDefaultBehaviour());
+        StateMachine.ChangeState(DefaultBehaviour.GetDefaultBehaviour(anm));
     }
 
     public void OnSeeTarget()
@@ -54,7 +59,7 @@ public class AI : MonoBehaviour
     public void OnTargetFound()
     {
         Debug.Log("[AI]." + name + " - Found target! Now chasing the target.");
-        StateMachine.ChangeState(new ChaseState(Sensor.Target));
+        StateMachine.ChangeState(new ChaseState(anm, Sensor.Target));
     }
 
     public void OnTargetLost()

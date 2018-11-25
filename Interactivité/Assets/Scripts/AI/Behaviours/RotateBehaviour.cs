@@ -6,8 +6,8 @@ public class RotateBehaviour : Behaviour
     public float RotationSpeed;
     public float MaxModifierOffset;
 
-    public override State<AI> GetDefaultBehaviour()
+    public override State<AI> GetDefaultBehaviour(AINetworkManager anm)
     {
-        return new RotateState(RotationSpeed, MaxModifierOffset);
+        return new RotateState(anm, RotationSpeed, MaxModifierOffset);
     }
 }

@@ -2,10 +2,12 @@
 
 public class ChaseState : State<AI>
 {
-    GameObject target;
+    private GameObject target;
+    private AINetworkManager anm;
 
-    public ChaseState(GameObject target)
+    public ChaseState(AINetworkManager anm, GameObject target)
     {
+        this.anm = anm;
         this.target = target;
     }
 
@@ -18,11 +20,17 @@ public class ChaseState : State<AI>
         Debug.Log("[State].Chase (Owner: " + owner + ") - Entering Chase State. Chasing " + target.name);
     }
 
+    public override void UpdateStateFromServer(float value)
+    {
+        target = null;
+        anm.ai.OnTargetLost();
+    }
+
     public override void UpdateState(AI owner)
     {
         if (!target)
         {
-            owner.OnTargetLost();
+            anm.SendToServer_UpdateStateFromServer(0);
             return;
         }
 
@@ -31,8 +39,7 @@ public class ChaseState : State<AI>
         if (Vector3.Distance(owner.transform.position, target.transform.position) <= 0.8f)
         {
             target.GetComponent<CharacterNetworkManager>().SendToServer_BackToSpawn();
-            target = null;
-            owner.OnTargetLost();
+            anm.SendToServer_UpdateStateFromServer(0);
         }
     }
 }

@@ -5,7 +5,6 @@ public class GoToState : State<AI>
     private Vector3 destination;
     private float acceptableDistance;
 
-
     public GoToState(Vector3 destination, float acceptableDistance)
     {
         this.destination = destination;
@@ -19,6 +18,11 @@ public class GoToState : State<AI>
         owner.NMA.acceleration = 10;
 
         owner.NMA.SetDestination(destination);
+    }
+
+    public override void UpdateStateFromServer(float value)
+    {
+
     }
 
     public override void UpdateState(AI owner)

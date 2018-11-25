@@ -10,6 +10,11 @@ public class LookAtState : State<AI>
         this.reactionTime = reactionTime;
     }
 
+    public override void UpdateStateFromServer(float value)
+    {
+
+    }
+
     public override void EnterState(AI owner)
     {
         Debug.Log("[State].LookAt (Owner: " + owner + ") - Entering LookAt State.");

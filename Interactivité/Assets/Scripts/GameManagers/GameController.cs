@@ -26,6 +26,8 @@ public class GameController : MonoBehaviour
     private bool createdMap;
     private bool isWinner;
 
+    private Controls selectedControls;
+
     public delegate void OnConnectingToServerHandler(bool offline);
     public event OnConnectingToServerHandler OnConnectingToServer;
 
@@ -38,6 +40,8 @@ public class GameController : MonoBehaviour
 
         timeBeforeGameStart = 1;
         delayGameStart = new WaitForSeconds(timeBeforeGameStart);
+
+        selectedControls = Controls.WASD;
 
         characterParentPrefabPath = "CharacterTemplatePrefab/CharacterTemplate";
         endPrefabPath = "EndPrefab/End";
@@ -69,6 +73,33 @@ public class GameController : MonoBehaviour
                 {
                     state = MainMenuState.CONNECTING;
                     OnConnectingToServer(false);
+                }
+                if (GUILayout.Button("Settings", GUILayout.Height(40)))
+                {
+                    state = MainMenuState.SETTINGS;
+                }
+                break;
+            case MainMenuState.SETTINGS:
+                if (selectedControls == Controls.WASD)
+                {
+                    GUILayout.Label("Selected controls: WASD");
+                }
+                else if (selectedControls == Controls.ARROWS)
+                {
+                    GUILayout.Label("Selected controls: Arrows");
+                }
+                if (GUILayout.Button("Arrows", GUILayout.Height(40)))
+                {
+                    selectedControls = Controls.ARROWS;
+                }
+                if (GUILayout.Button("WASD", GUILayout.Height(40)))
+                {
+                    selectedControls = Controls.WASD;
+                }
+                GUILayout.Label("\n");
+                if (GUILayout.Button("Return to Main Menu", GUILayout.Height(40)))
+                {
+                    state = MainMenuState.MAIN;
                 }
                 break;
             case MainMenuState.CONNECTING:
@@ -111,16 +142,47 @@ public class GameController : MonoBehaviour
                 break;
             case MainMenuState.IN_GAME:
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length);
+                if (PhotonNetwork.offlineMode)
+                {
+                    if (GUILayout.Button("Pause", GUILayout.Height(40)))
+                    {
+                        state = MainMenuState.PAUSE;
+                        Time.timeScale = 0;
+                    }
+                }
+                break;
+            case MainMenuState.PAUSE:
+                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length);
+                if (GUILayout.Button("Resume game", GUILayout.Height(40)))
+                {
+                    state = MainMenuState.IN_GAME;
+                    Time.timeScale = 1;
+                }
+                if (GUILayout.Button("Return to Main Menu", GUILayout.Height(40)))
+                {
+                    Time.timeScale = 1;
+                    mainMenuCamera.SetActive(true);
+                    PhotonNetwork.Disconnect();
+                    PhotonNetwork.Destroy(StaticObjects.CharacterNetworkManager.transform.parent.gameObject);
+                    state = MainMenuState.MAIN;
+                }
                 break;
             case MainMenuState.END:
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
                 if (isWinner)
                 {
-                    GUILayout.Label("You won!!!");
+                    GUILayout.Label("You win!!!");
                 }
                 else
                 {
-                    GUILayout.Label("You lost...");
+                    GUILayout.Label("You lose...");
+                }
+                if (GUILayout.Button("Return to Main Menu", GUILayout.Height(40)))
+                {
+                    mainMenuCamera.SetActive(true);
+                    PhotonNetwork.Disconnect();
+                    PhotonNetwork.Destroy(StaticObjects.CharacterNetworkManager.transform.parent.gameObject);
+                    state = MainMenuState.MAIN;
                 }
                 break;
         }
@@ -155,7 +217,7 @@ public class GameController : MonoBehaviour
     public void OnReceiveReadyFromServer()
     {
         playersReady++;
-        if (playersReady == 1)
+        if (playersReady == 2 || PhotonNetwork.offlineMode)
         {
             StaticObjects.AIManager.GetTargets();
         }
@@ -177,7 +239,14 @@ public class GameController : MonoBehaviour
         yield return delayGameStart;
 
         state = MainMenuState.IN_GAME;
-        StaticObjects.CharacterNetworkManager.gameObject.AddComponent<InputManager>();
+        if (selectedControls == Controls.WASD)
+        {
+            StaticObjects.CharacterNetworkManager.gameObject.AddComponent<WASDInputManager>();
+        }
+        else if (selectedControls == Controls.ARROWS)
+        {
+            StaticObjects.CharacterNetworkManager.gameObject.AddComponent<ArrowsInputManager>();
+        }
     }
 
     private void OnGameEnd()
@@ -203,5 +272,13 @@ enum MainMenuState
     READY_TO_PLAY,
     IN_DELAY,
     IN_GAME,
+    PAUSE,
     END,
+    SETTINGS,
+}
+
+enum Controls
+{
+    WASD,
+    ARROWS,
 }

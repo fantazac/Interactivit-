@@ -47,6 +47,8 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
+        StaticObjects.GameController = this;
+
         uiManager = GetComponent<UIManager>();
 
         characterParentPrefab = Resources.Load<GameObject>(characterParentPrefabPath);
@@ -61,10 +63,6 @@ public class GameController : MonoBehaviour
         GameObject character = PhotonNetwork.Instantiate("Character" + (IsGameHost ? 1 : 2), IsGameHost ? spawn1 : spawn2, Quaternion.identity, 0);
         character.transform.parent = Instantiate(characterParentPrefab).transform;
         cnm = character.GetComponent<CharacterNetworkManager>();
-        cnm.OnReadyFromServer += OnReadyFromServer;
-        cnm.OnStartFromServer += OnStartFromServer;
-        cnm.OnEndFromServer += OnEndFromServer;
-        cnm.OnBackToSpawnFromServer += OnBackToSpawnFromServer;
 
         endManager = Instantiate(endPrefab, IsGameHost ? end1 : end2, Quaternion.identity).GetComponent<EndManager>();
         endManager.SetCharacter(character);
@@ -112,12 +110,12 @@ public class GameController : MonoBehaviour
         return playerDeaths;
     }
 
-    private void OnReadyFromServer()
+    public void OnReadyFromServer()
     {
         playersReady++;
         if (playersReady == 2 || PhotonNetwork.offlineMode)
         {
-            StaticObjects.AIManager.GetTargets();
+            StaticObjects.AIManager.SetTargetsAndAIs();
         }
         if (IsGameHost && playersReady == 2 || PhotonNetwork.offlineMode)
         {
@@ -125,12 +123,12 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void OnStartFromServer()
+    public void OnStartFromServer()
     {
         StartCoroutine(GameStartDelay());
     }
 
-    private void OnBackToSpawnFromServer()
+    public void OnBackToSpawnFromServer()
     {
         playerDeaths++;
     }
@@ -158,7 +156,7 @@ public class GameController : MonoBehaviour
         cnm.SendToServer_End(IsGameHost);
     }
 
-    private void OnEndFromServer(bool isGameHost)
+    public void OnEndFromServer(bool isGameHost)
     {
         Destroy(cnm.GetComponent<InputManager>());
         cnm.GetComponent<CharacterMovement>().StopAllMovement();

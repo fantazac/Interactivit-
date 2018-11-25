@@ -5,18 +5,6 @@ public class CharacterNetworkManager : MonoBehaviour
     private CharacterMovement characterMovement;
     private PhotonView photonView;
 
-    public delegate void OnBackToSpawnFromServerHandler();
-    public event OnBackToSpawnFromServerHandler OnBackToSpawnFromServer;
-
-    public delegate void OnEndFromServerHandler(bool isGameHost);
-    public event OnEndFromServerHandler OnEndFromServer;
-
-    public delegate void OnReadyFromServerHandler();
-    public event OnReadyFromServerHandler OnReadyFromServer;
-
-    public delegate void OnStartFromServerHandler();
-    public event OnStartFromServerHandler OnStartFromServer;
-
     private void Awake()
     {
         characterMovement = GetComponent<CharacterMovement>();
@@ -31,7 +19,7 @@ public class CharacterNetworkManager : MonoBehaviour
     [PunRPC]
     private void ReceiveFromServer_Ready()
     {
-        OnReadyFromServer();
+        StaticObjects.GameController.OnReadyFromServer();
     }
 
     public void SendToServer_Start()
@@ -42,7 +30,7 @@ public class CharacterNetworkManager : MonoBehaviour
     [PunRPC]
     private void ReceiveFromServer_Start()
     {
-        OnStartFromServer();
+        StaticObjects.GameController.OnStartFromServer();
     }
 
     public void SendToServer_MoveLeft(bool moveLeft)
@@ -97,7 +85,8 @@ public class CharacterNetworkManager : MonoBehaviour
     [PunRPC]
     private void ReceiveFromServer_BackToSpawn()
     {
-        OnBackToSpawnFromServer();
+        StaticObjects.GameController.OnBackToSpawnFromServer();
+        characterMovement.OnBackToSpawnFromServer();
     }
 
     public void SendToServer_End(bool isGameHost)
@@ -108,6 +97,6 @@ public class CharacterNetworkManager : MonoBehaviour
     [PunRPC]
     private void ReceiveFromServer_End(bool isGameHost)
     {
-        OnEndFromServer(isGameHost);
+        StaticObjects.GameController.OnEndFromServer(isGameHost);
     }
 }

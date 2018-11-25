@@ -20,7 +20,7 @@ public class AIManager : MonoBehaviour
 
     public void SpawnAIs(bool hardMode)
     {
-        ais = new List<AI>();
+
         for (int i = 0; i < spawnPoint.Length; i++)
         {
             CreateAIInstance(spawnPoint[i].position, hardMode);
@@ -30,22 +30,23 @@ public class AIManager : MonoBehaviour
     private void CreateAIInstance(Vector3 position, bool hardMode)
     {
         Debug.Log("Spawning AI Pawn at " + position);
-        ais.Add(PhotonNetwork.Instantiate("BadGuy_" + (hardMode ? "Hard" : "Easy"), position, Quaternion.identity, 0).GetComponent<AI>());
+        PhotonNetwork.Instantiate("BadGuy_" + (hardMode ? "Hard" : "Easy"), position, Quaternion.identity, 0);
     }
 
-    public void GetTargets()
+    public void SetTargetsAndAIs()
     {
         CharacterNetworkManager[] players = FindObjectsOfType<CharacterNetworkManager>();
         Targets = new Transform[players.Length];
-
         for (int i = 0; i < players.Length; i++)
         {
             Targets[i] = players[i].transform;
         }
 
-        for (int i = 0; i < ais.Count; i++)
+        ais = new List<AI>();
+        foreach (AI ai in FindObjectsOfType<AI>())
         {
-            ais[i].ShouldLookForTargets = true;
+            ais.Add(ai);
+            ai.ShouldLookForTargets = true;
         }
     }
 }

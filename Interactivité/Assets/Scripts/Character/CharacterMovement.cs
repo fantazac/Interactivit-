@@ -23,7 +23,6 @@ public class CharacterMovement : MonoBehaviour
         spawn = transform.position;
 
         cnm = GetComponent<CharacterNetworkManager>();
-        cnm.OnBackToSpawnFromServer += OnBackToSpawnFromServer;
     }
 
     public void SetupMovementInputs(InputManager inputManager)
@@ -102,7 +101,7 @@ public class CharacterMovement : MonoBehaviour
         OnMoveDown(false);
     }
 
-    private void OnBackToSpawnFromServer()
+    public void OnBackToSpawnFromServer()
     {
         transform.position = spawn;
     }

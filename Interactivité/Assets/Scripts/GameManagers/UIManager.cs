@@ -273,6 +273,7 @@ public class UIManager : MonoBehaviour
     {
         gameController.UnpauseGame();
         mainMenuCamera.SetActive(true);
+        gameController.ResetGame();
         networkConnectionController.Disconnect();
         state = MainMenuState.MAIN_MENU;
     }

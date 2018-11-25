@@ -24,7 +24,6 @@ public class NetworkConnectionController : MonoBehaviour
     public void Disconnect()
     {
         PhotonNetwork.Disconnect();
-        PhotonNetwork.Destroy(StaticObjects.CharacterNetworkManager.transform.parent.gameObject);
     }
 
     private void OnConnectedToMaster()

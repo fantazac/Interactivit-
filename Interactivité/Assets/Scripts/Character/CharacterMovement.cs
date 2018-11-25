@@ -9,7 +9,7 @@ public class CharacterMovement : MonoBehaviour
 
     private float movementSpeed;
 
-    private CharacterNetworkManager characterNetworkManager;
+    private CharacterNetworkManager cnm;
 
     private Vector3 spawn;
 
@@ -22,7 +22,8 @@ public class CharacterMovement : MonoBehaviour
     {
         spawn = transform.position;
 
-        characterNetworkManager = GetComponent<CharacterNetworkManager>();
+        cnm = GetComponent<CharacterNetworkManager>();
+        cnm.OnBackToSpawnFromServer += OnBackToSpawnFromServer;
     }
 
     public void SetupMovementInputs(InputManager inputManager)
@@ -55,22 +56,22 @@ public class CharacterMovement : MonoBehaviour
 
     private void OnMoveLeft(bool move)
     {
-        characterNetworkManager.SendToServer_MoveLeft(move);
+        cnm.SendToServer_MoveLeft(move);
     }
 
     private void OnMoveRight(bool move)
     {
-        characterNetworkManager.SendToServer_MoveRight(move);
+        cnm.SendToServer_MoveRight(move);
     }
 
     private void OnMoveUp(bool move)
     {
-        characterNetworkManager.SendToServer_MoveUp(move);
+        cnm.SendToServer_MoveUp(move);
     }
 
     private void OnMoveDown(bool move)
     {
-        characterNetworkManager.SendToServer_MoveDown(move);
+        cnm.SendToServer_MoveDown(move);
     }
 
     public void OnReceiveMoveLeftFromServer(bool moveLeft)
@@ -93,17 +94,16 @@ public class CharacterMovement : MonoBehaviour
         this.moveDown = moveDown;
     }
 
-    public void OnReceiveBackToSpawn()
-    {
-        transform.position = spawn;
-        StaticObjects.GameController.OnPlayerBackToSpawn();
-    }
-
     public void StopAllMovement()
     {
         OnMoveLeft(false);
         OnMoveRight(false);
         OnMoveUp(false);
         OnMoveDown(false);
+    }
+
+    private void OnBackToSpawnFromServer()
+    {
+        transform.position = spawn;
     }
 }

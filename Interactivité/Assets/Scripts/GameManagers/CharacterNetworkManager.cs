@@ -2,13 +2,25 @@
 
 public class CharacterNetworkManager : MonoBehaviour
 {
-    private PhotonView photonView;
     private CharacterMovement characterMovement;
+    private PhotonView photonView;
+
+    public delegate void OnBackToSpawnFromServerHandler();
+    public event OnBackToSpawnFromServerHandler OnBackToSpawnFromServer;
+
+    public delegate void OnEndFromServerHandler(bool isGameHost);
+    public event OnEndFromServerHandler OnEndFromServer;
+
+    public delegate void OnReadyFromServerHandler();
+    public event OnReadyFromServerHandler OnReadyFromServer;
+
+    public delegate void OnStartFromServerHandler();
+    public event OnStartFromServerHandler OnStartFromServer;
 
     private void Awake()
     {
-        photonView = GetComponent<PhotonView>();
         characterMovement = GetComponent<CharacterMovement>();
+        photonView = GetComponent<PhotonView>();
     }
 
     public void SendToServer_Ready()
@@ -19,7 +31,7 @@ public class CharacterNetworkManager : MonoBehaviour
     [PunRPC]
     private void ReceiveFromServer_Ready()
     {
-        StaticObjects.GameController.OnReceiveReadyFromServer();
+        OnReadyFromServer();
     }
 
     public void SendToServer_Start()
@@ -30,7 +42,7 @@ public class CharacterNetworkManager : MonoBehaviour
     [PunRPC]
     private void ReceiveFromServer_Start()
     {
-        StaticObjects.GameController.OnReceiveStartFromServer();
+        OnStartFromServer();
     }
 
     public void SendToServer_MoveLeft(bool moveLeft)
@@ -85,17 +97,17 @@ public class CharacterNetworkManager : MonoBehaviour
     [PunRPC]
     private void ReceiveFromServer_BackToSpawn()
     {
-        characterMovement.OnReceiveBackToSpawn();
+        OnBackToSpawnFromServer();
     }
 
-    public void SendToServer_End(bool createdMap)
+    public void SendToServer_End(bool isGameHost)
     {
-        photonView.RPC("ReceiveFromServer_End", PhotonTargets.AllViaServer, createdMap);
+        photonView.RPC("ReceiveFromServer_End", PhotonTargets.AllViaServer, isGameHost);
     }
 
     [PunRPC]
-    private void ReceiveFromServer_End(bool createdMap)
+    private void ReceiveFromServer_End(bool isGameHost)
     {
-        StaticObjects.GameController.OnReceiveEndFromServer(createdMap);
+        OnEndFromServer(isGameHost);
     }
 }

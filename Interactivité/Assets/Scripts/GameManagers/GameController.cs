@@ -17,15 +17,12 @@ public class GameController : MonoBehaviour
     private Vector3 end1;
     private Vector3 end2;
 
-    private EndManager endManager;
-
-    private int playersReady;
-    private bool isWinner;
-
     private float gameStartTime;
+    private int playerDeaths;
+    private int playersReady;
 
-    private int deaths;
-
+    private CharacterNetworkManager cnm;
+    private EndManager endManager;
     private UIManager uiManager;
 
     public bool HardMode { get; set; }
@@ -50,8 +47,6 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        StaticObjects.GameController = this;
-
         uiManager = GetComponent<UIManager>();
 
         characterParentPrefab = Resources.Load<GameObject>(characterParentPrefabPath);
@@ -61,11 +56,15 @@ public class GameController : MonoBehaviour
     public void SpawnPlayer(bool isGameHost)
     {
         IsGameHost = isGameHost;
-        deaths = 0;
+        playerDeaths = 0;
 
         GameObject character = PhotonNetwork.Instantiate("Character" + (IsGameHost ? 1 : 2), IsGameHost ? spawn1 : spawn2, Quaternion.identity, 0);
-        StaticObjects.CharacterNetworkManager = character.GetComponent<CharacterNetworkManager>();
         character.transform.parent = Instantiate(characterParentPrefab).transform;
+        cnm = character.GetComponent<CharacterNetworkManager>();
+        cnm.OnReadyFromServer += OnReadyFromServer;
+        cnm.OnStartFromServer += OnStartFromServer;
+        cnm.OnEndFromServer += OnEndFromServer;
+        cnm.OnBackToSpawnFromServer += OnBackToSpawnFromServer;
 
         endManager = Instantiate(endPrefab, IsGameHost ? end1 : end2, Quaternion.identity).GetComponent<EndManager>();
         endManager.SetCharacter(character);
@@ -80,7 +79,7 @@ public class GameController : MonoBehaviour
 
     public void SetReadyToPlay()
     {
-        StaticObjects.CharacterNetworkManager.SendToServer_Ready();
+        cnm.SendToServer_Ready();
     }
 
     public void PauseGame()
@@ -93,6 +92,11 @@ public class GameController : MonoBehaviour
         Time.timeScale = 1;
     }
 
+    public void ResetGame()
+    {
+        PhotonNetwork.Destroy(cnm.transform.parent.gameObject);
+    }
+
     public int GetCurrentGameTime()
     {
         return (int)(Time.time - gameStartTime);
@@ -100,15 +104,15 @@ public class GameController : MonoBehaviour
 
     public int GetDistanceFromEnd()
     {
-        return (int)Vector3.Distance(endManager.transform.position, StaticObjects.CharacterNetworkManager.transform.position);
+        return (int)Vector3.Distance(endManager.transform.position, cnm.transform.position);
     }
 
     public int GetPlayerDeaths()
     {
-        return deaths;
+        return playerDeaths;
     }
 
-    public void OnReceiveReadyFromServer()
+    private void OnReadyFromServer()
     {
         playersReady++;
         if (playersReady == 2 || PhotonNetwork.offlineMode)
@@ -117,18 +121,18 @@ public class GameController : MonoBehaviour
         }
         if (IsGameHost && playersReady == 2 || PhotonNetwork.offlineMode)
         {
-            StaticObjects.CharacterNetworkManager.SendToServer_Start();
+            cnm.SendToServer_Start();
         }
     }
 
-    public void OnReceiveStartFromServer()
+    private void OnStartFromServer()
     {
         StartCoroutine(GameStartDelay());
     }
 
-    public void OnPlayerBackToSpawn()
+    private void OnBackToSpawnFromServer()
     {
-        deaths++;
+        playerDeaths++;
     }
 
     private IEnumerator GameStartDelay()
@@ -140,25 +144,25 @@ public class GameController : MonoBehaviour
         uiManager.StartGame();
         if (SelectedControls == Controls.WASD)
         {
-            StaticObjects.CharacterNetworkManager.gameObject.AddComponent<WASDInputManager>();
+            cnm.gameObject.AddComponent<WASDInputManager>();
         }
         else if (SelectedControls == Controls.ARROWS)
         {
-            StaticObjects.CharacterNetworkManager.gameObject.AddComponent<ArrowsInputManager>();
+            cnm.gameObject.AddComponent<ArrowsInputManager>();
         }
         gameStartTime = Time.time;
     }
 
     private void OnGameEnd()
     {
-        StaticObjects.CharacterNetworkManager.SendToServer_End(IsGameHost);
+        cnm.SendToServer_End(IsGameHost);
     }
 
-    public void OnReceiveEndFromServer(bool isGameHost)
+    private void OnEndFromServer(bool isGameHost)
     {
-        Destroy(StaticObjects.CharacterNetworkManager.GetComponent<InputManager>());
-        StaticObjects.CharacterNetworkManager.GetComponent<CharacterMovement>().StopAllMovement();
-        if(IsGameHost == isGameHost)
+        Destroy(cnm.GetComponent<InputManager>());
+        cnm.GetComponent<CharacterMovement>().StopAllMovement();
+        if (IsGameHost == isGameHost)
         {
             uiManager.SetupWinner();
         }

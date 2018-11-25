@@ -60,6 +60,8 @@ public class GameController : MonoBehaviour
     {
         IsGameHost = isGameHost;
         playerDeaths = 0;
+        playersReady = 0;
+        GameIsActive = false;
 
         GameObject character = PhotonNetwork.Instantiate("Character" + (IsGameHost ? 1 : 2), IsGameHost ? spawn1 : spawn2, Quaternion.identity, 0);
         character.transform.parent = Instantiate(characterParentPrefab).transform;

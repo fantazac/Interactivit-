@@ -1,17 +1,15 @@
 ﻿using UnityEngine;
 
-public class NetworkConnectionManager : MonoBehaviour
+public class NetworkConnectionController : MonoBehaviour
 {
-    public delegate void OnConnectedToServerHandler(bool createdMap);
-    public event OnConnectedToServerHandler OnConnectedToServer;
+    private UIManager uiManager;
 
     private void Start()
     {
-        GameController mainMenuManager = GetComponent<GameController>();
-        mainMenuManager.OnConnectingToServer += OnConnectingToServer;
+        uiManager = GetComponent<UIManager>();
     }
 
-    private void OnConnectingToServer(bool offline)
+    public void ConnectToServer(bool offline)
     {
         if (offline)
         {
@@ -21,6 +19,12 @@ public class NetworkConnectionManager : MonoBehaviour
         {
             Connect();
         }
+    }
+
+    public void Disconnect()
+    {
+        PhotonNetwork.Disconnect();
+        PhotonNetwork.Destroy(StaticObjects.CharacterNetworkManager.transform.parent.gameObject);
     }
 
     private void OnConnectedToMaster()
@@ -47,13 +51,12 @@ public class NetworkConnectionManager : MonoBehaviour
     {
         if (PhotonNetwork.playerList.Length > 2)
         {
-            PhotonNetwork.LeaveRoom();
-            PhotonNetwork.LeaveLobby();
+            PhotonNetwork.Disconnect();
             Debug.Log("There are already 2 players in the game. Please wait until at least 1 player disconnects.");
         }
         else
         {
-            OnConnectedToServer(PhotonNetwork.playerList.Length == 1);
+            uiManager.ConnectedToServer(PhotonNetwork.playerList.Length == 1);
         }
     }
 }

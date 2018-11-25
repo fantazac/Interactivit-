@@ -4,6 +4,8 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
     [SerializeField]
+    private GameObject firstScreenCamera;
+    [SerializeField]
     private GameObject mainMenuCamera;
 
     private string characterParentPrefabPath;
@@ -59,7 +61,7 @@ public class GameController : MonoBehaviour
 
         GetComponent<NetworkConnectionManager>().OnConnectedToServer += OnNetworkConnectedToServer;
 
-        state = MainMenuState.MAIN;
+        state = MainMenuState.START_SCREEN;
 
         characterParentPrefab = Resources.Load<GameObject>(characterParentPrefabPath);
         endPrefab = Resources.Load<GameObject>(endPrefabPath);
@@ -69,6 +71,14 @@ public class GameController : MonoBehaviour
     {
         switch (state)
         {
+            case MainMenuState.START_SCREEN:
+                if (GUILayout.Button("Enter", GUILayout.Height(40)))
+                {
+                    firstScreenCamera.SetActive(false);
+                    mainMenuCamera.SetActive(true);
+                    state = MainMenuState.MAIN;
+                }
+                break;
             case MainMenuState.MAIN:
                 if (GUILayout.Button("Single player", GUILayout.Height(40)))
                 {
@@ -137,6 +147,21 @@ public class GameController : MonoBehaviour
                 break;
             case MainMenuState.CONNECTING:
                 GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
+                break;
+            case MainMenuState.CONFIGURATION:
+                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n");
+                if (GUILayout.Button("Map 1", GUILayout.Height(40)))
+                {
+                    SpawnMapAndAIs("Map1");
+                }
+                if (GUILayout.Button("Map 2", GUILayout.Height(40)))
+                {
+                    SpawnMapAndAIs("Map2");
+                }
+                if (GUILayout.Button("Map 3", GUILayout.Height(40)))
+                {
+                    SpawnMapAndAIs("Map3");
+                }
                 break;
             case MainMenuState.IN_ROOM:
                 GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n");
@@ -218,16 +243,14 @@ public class GameController : MonoBehaviour
     private void OnNetworkConnectedToServer(bool createdMap)
     {
         this.createdMap = createdMap;
-        if (createdMap)
-        {
-            int random = Random.Range(1, 4);
-            PhotonNetwork.Instantiate("Map" + random, Vector3.zero, Quaternion.identity, 0);
-        }
         SpawnPlayer();
-        if (createdMap)
-        {
-            StaticObjects.AIManager.SpawnAIs(hardMode);
-        }
+        state = createdMap ? MainMenuState.CONFIGURATION : MainMenuState.IN_ROOM;
+    }
+
+    private void SpawnMapAndAIs(string mapPath)
+    {
+        StaticObjects.AIManager.SpawnAIs(hardMode);
+        PhotonNetwork.Instantiate(mapPath, Vector3.zero, Quaternion.identity, 0);
         state = MainMenuState.IN_ROOM;
     }
 
@@ -301,8 +324,10 @@ public class GameController : MonoBehaviour
 
 enum MainMenuState
 {
+    START_SCREEN,
     MAIN,
     CONNECTING,
+    CONFIGURATION,
     IN_ROOM,
     READY_TO_PLAY,
     IN_DELAY,

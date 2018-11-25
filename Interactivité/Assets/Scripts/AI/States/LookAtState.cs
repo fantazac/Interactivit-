@@ -10,9 +10,10 @@ public class LookAtState : State<AI>
         this.reactionTime = reactionTime;
     }
 
-    public override void InitState() { }
-    public override void StartState() { }
-    public override void UpdateStateFromServer(float value1, Vector3 value2) { }
+    public override void UpdateStateFromServer(float value)
+    {
+
+    }
 
     public override void EnterState(AI owner)
     {

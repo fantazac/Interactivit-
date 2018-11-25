@@ -6,22 +6,13 @@ public class RotateState : State<AI>
     private float maxModifierOffset;
     private float timeElapsedSinceLastRotation;
 
-    private bool infoSent;
-
-    private AINetworkManager anm;
-
     public RotateState(AINetworkManager anm, float rotationSpeed = 40, float maxModifierOffset = 20)
     {
-        this.anm = anm;
-        infoSent = !StaticObjects.GameController.IsGameHost;
         if (StaticObjects.GameController.IsGameHost)
         {
             this.rotationSpeed = rotationSpeed;
             this.maxModifierOffset = maxModifierOffset;
-        }
-        if (StaticObjects.GameController.GameIsActive)
-        {
-            InitState();
+            anm.SendToServer_UpdateStateFromServer(GetRotationSpeed());
         }
     }
 
@@ -33,20 +24,9 @@ public class RotateState : State<AI>
         return rotationSpeedToSend;
     }
 
-    public override void InitState()
+    public override void UpdateStateFromServer(float rotationSpeed)
     {
-        if (StaticObjects.GameController.IsGameHost)
-        {
-            StaticObjects.GameController.StateCoroutine(this);
-        }
-    }
-
-    public override void StartState() { }
-
-    public override void UpdateStateFromServer(float value1, Vector3 value2)
-    {
-        Debug.Log(value1);
-        rotationSpeed = value1;
+        this.rotationSpeed = rotationSpeed;
     }
 
     public override void EnterState(AI owner)
@@ -61,18 +41,6 @@ public class RotateState : State<AI>
             owner.OnSeeTarget();
         }
 
-        if (infoSent)
-        {
-            owner.transform.Rotate(0, rotationSpeed * Time.deltaTime, 0);
-        }
-    }
-
-    public void PostCoroutine()
-    {
-        if (StaticObjects.GameController.IsGameHost)
-        {
-            anm.SendToServer_UpdateStateFromServer(GetRotationSpeed());
-            infoSent = true;
-        }
+        owner.transform.Rotate(0, rotationSpeed * Time.deltaTime, 0);
     }
 }

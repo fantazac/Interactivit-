@@ -20,10 +20,7 @@ public class ChaseState : State<AI>
         Debug.Log("[State].Chase (Owner: " + owner + ") - Entering Chase State. Chasing " + target.name);
     }
 
-    public override void InitState() { }
-    public override void StartState() { }
-
-    public override void UpdateStateFromServer(float value1, Vector3 value2)
+    public override void UpdateStateFromServer(float value)
     {
         target = null;
         anm.ai.OnTargetLost();

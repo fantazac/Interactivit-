@@ -5,24 +5,10 @@ public class GoToState : State<AI>
     private Vector3 destination;
     private float acceptableDistance;
 
-    private AINetworkManager anm;
-
-    public GoToState(AINetworkManager anm, Vector3 destination, float acceptableDistance)
+    public GoToState(Vector3 destination, float acceptableDistance)
     {
-        this.anm = anm;
         this.destination = destination;
-        if (StaticObjects.GameController.IsGameHost)
-        {
-            this.acceptableDistance = acceptableDistance;
-        }
-    }
-
-    public override void InitState()
-    {
-        if (StaticObjects.GameController.IsGameHost)
-        {
-            anm.SendToServer_UpdateStateFromServerWithVector(acceptableDistance, destination);
-        }
+        this.acceptableDistance = acceptableDistance;
     }
 
     public override void EnterState(AI owner)
@@ -30,21 +16,13 @@ public class GoToState : State<AI>
         owner.NMA.speed = 3;
         owner.NMA.angularSpeed = 1000;
         owner.NMA.acceleration = 10;
-        if (StaticObjects.GameController.GameIsActive)
-        {
-            StartState();
-        }
+
+        owner.NMA.SetDestination(destination);
     }
 
-    public override void StartState()
+    public override void UpdateStateFromServer(float value)
     {
-        anm.ai.NMA.SetDestination(destination);
-    }
 
-    public override void UpdateStateFromServer(float value1, Vector3 value2)
-    {
-        acceptableDistance = value1;
-        destination = value2;
     }
 
     public override void UpdateState(AI owner)

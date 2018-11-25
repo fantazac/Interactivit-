@@ -48,5 +48,4 @@ MonoBehaviour:
   - ReceiveFromServer_InitState
   - ReceiveFromServer_TargetLost
   - ReceiveFromServer_UpdateStateFromServer
-  - ReceiveFromServer_UpdateStateFromServerWithVector
   DisableAutoOpenWizard: 1

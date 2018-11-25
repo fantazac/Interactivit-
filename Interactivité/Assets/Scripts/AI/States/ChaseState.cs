@@ -22,7 +22,7 @@ public class ChaseState : State<AI>
     {
         if (!target)
         {
-            owner.DefaultState();
+            owner.OnTargetLost();
             return;
         }
 
@@ -32,7 +32,7 @@ public class ChaseState : State<AI>
         {
             target.GetComponent<CharacterNetworkManager>().SendToServer_BackToSpawn();
             target = null;
-            owner.DefaultState();
+            owner.OnTargetLost();
         }
     }
 }

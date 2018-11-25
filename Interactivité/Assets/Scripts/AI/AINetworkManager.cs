@@ -5,7 +5,7 @@ public class AINetworkManager : MonoBehaviour
     public AI ai;
     private PhotonView photonView;
 
-    private void Awake()
+    private void Init()
     {
         if (!photonView)
         {
@@ -18,7 +18,7 @@ public class AINetworkManager : MonoBehaviour
     {
         if (!photonView)
         {
-            Awake();
+            Init();
         }
         photonView.RPC("ReceiveFromServer_UpdateStateFromServer", PhotonTargets.AllBufferedViaServer, value);
     }

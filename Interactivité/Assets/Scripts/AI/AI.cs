@@ -32,7 +32,10 @@ public class AI : MonoBehaviour
 
     private void Update()
     {
-        StateMachine.UpdateStateMachine();
+        if (StaticObjects.GameController.GameIsActive)
+        {
+            StateMachine.UpdateStateMachine();
+        }
     }
 
     public void SetBehaviour(Behaviour behaviour)

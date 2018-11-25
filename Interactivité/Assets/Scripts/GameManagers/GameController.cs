@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour
     private EndManager endManager;
     private UIManager uiManager;
 
+    public bool GameIsActive { get; private set; }
     public bool HardMode { get; set; }
     public bool IsGameHost { get; private set; }
     public Controls SelectedControls { get; set; }
@@ -149,6 +150,7 @@ public class GameController : MonoBehaviour
             cnm.gameObject.AddComponent<ArrowsInputManager>();
         }
         gameStartTime = Time.time;
+        GameIsActive = true;
     }
 
     private void OnGameEnd()

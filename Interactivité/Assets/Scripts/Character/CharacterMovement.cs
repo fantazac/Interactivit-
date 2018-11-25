@@ -96,6 +96,7 @@ public class CharacterMovement : MonoBehaviour
     public void OnReceiveBackToSpawn()
     {
         transform.position = spawn;
+        StaticObjects.GameController.OnPlayerBackToSpawn();
     }
 
     public void StopAllMovement()

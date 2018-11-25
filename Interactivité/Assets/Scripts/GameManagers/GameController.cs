@@ -22,11 +22,17 @@ public class GameController : MonoBehaviour
     private Vector3 end1;
     private Vector3 end2;
 
+    private EndManager endManager;
+
     private int playersReady;
     private bool createdMap;
     private bool isWinner;
 
     private Controls selectedControls;
+    private bool hardMode;
+
+    private int deaths;
+    private float gameStartTime;
 
     public delegate void OnConnectingToServerHandler(bool offline);
     public event OnConnectingToServerHandler OnConnectingToServer;
@@ -74,9 +80,19 @@ public class GameController : MonoBehaviour
                     state = MainMenuState.CONNECTING;
                     OnConnectingToServer(false);
                 }
+                GUILayout.Label("------------------------------");
                 if (GUILayout.Button("Settings", GUILayout.Height(40)))
                 {
                     state = MainMenuState.SETTINGS;
+                }
+                GUILayout.Label("------------------------------");
+                if (GUILayout.Button("Quit", GUILayout.Height(40)))
+                {
+#if UNITY_EDITOR
+                    UnityEditor.EditorApplication.isPlaying = false;
+#else
+                    Application.Quit();
+#endif
                 }
                 break;
             case MainMenuState.SETTINGS:
@@ -96,7 +112,24 @@ public class GameController : MonoBehaviour
                 {
                     selectedControls = Controls.WASD;
                 }
-                GUILayout.Label("\n");
+                GUILayout.Label("-----------------------------------------");
+                if (!hardMode)
+                {
+                    GUILayout.Label("Selected difficulty: Easy");
+                }
+                else
+                {
+                    GUILayout.Label("Selected difficulty: Hard");
+                }
+                if (GUILayout.Button("Easy", GUILayout.Height(40)))
+                {
+                    hardMode = false;
+                }
+                if (GUILayout.Button("Hard", GUILayout.Height(40)))
+                {
+                    hardMode = true;
+                }
+                GUILayout.Label("-----------------------------------------");
                 if (GUILayout.Button("Return to Main Menu", GUILayout.Height(40)))
                 {
                     state = MainMenuState.MAIN;
@@ -105,20 +138,8 @@ public class GameController : MonoBehaviour
             case MainMenuState.CONNECTING:
                 GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
                 break;
-            case MainMenuState.AI_SPAWN:
-                if (GUILayout.Button("Easy", GUILayout.Height(40)))
-                {
-                    StaticObjects.AIManager.SpawnAIs(false);
-                    state = MainMenuState.IN_ROOM;
-                }
-                if (GUILayout.Button("Hard", GUILayout.Height(40)))
-                {
-                    StaticObjects.AIManager.SpawnAIs(true);
-                    state = MainMenuState.IN_ROOM;
-                }
-                break;
             case MainMenuState.IN_ROOM:
-                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
+                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n");
                 if (PhotonNetwork.playerList.Length == 2 || PhotonNetwork.offlineMode)
                 {
                     if (GUILayout.Button("Ready to play!", GUILayout.Height(40)))
@@ -133,15 +154,19 @@ public class GameController : MonoBehaviour
                 }
                 break;
             case MainMenuState.READY_TO_PLAY:
-                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
+                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n");
                 GUILayout.Label("Waiting for the other player to be ready...");
                 break;
             case MainMenuState.IN_DELAY:
-                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
+                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n");
                 GUILayout.Label("GO!!!");
                 break;
             case MainMenuState.IN_GAME:
-                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length);
+                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n");
+                GUILayout.Label("Deaths: " + deaths);
+                GUILayout.Label("Distance until goal: " + (int)Vector3.Distance(endManager.transform.position, StaticObjects.CharacterNetworkManager.transform.position));
+                GUILayout.Label("Game time: " + (int)(Time.time - gameStartTime));
+                GUILayout.Label("");
                 if (PhotonNetwork.offlineMode)
                 {
                     if (GUILayout.Button("Pause", GUILayout.Height(40)))
@@ -152,7 +177,7 @@ public class GameController : MonoBehaviour
                 }
                 break;
             case MainMenuState.PAUSE:
-                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length);
+                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n");
                 if (GUILayout.Button("Resume game", GUILayout.Height(40)))
                 {
                     state = MainMenuState.IN_GAME;
@@ -161,6 +186,7 @@ public class GameController : MonoBehaviour
                 if (GUILayout.Button("Return to Main Menu", GUILayout.Height(40)))
                 {
                     Time.timeScale = 1;
+                    deaths = 0;
                     mainMenuCamera.SetActive(true);
                     PhotonNetwork.Disconnect();
                     PhotonNetwork.Destroy(StaticObjects.CharacterNetworkManager.transform.parent.gameObject);
@@ -168,17 +194,18 @@ public class GameController : MonoBehaviour
                 }
                 break;
             case MainMenuState.END:
-                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n\n");
+                GUILayout.Label("Ping: " + PhotonNetwork.GetPing().ToString() + "  -  Players Online: " + PhotonNetwork.playerList.Length + "\n");
                 if (isWinner)
                 {
-                    GUILayout.Label("You win!!!");
+                    GUILayout.Label("You win!!!\n");
                 }
                 else
                 {
-                    GUILayout.Label("You lose...");
+                    GUILayout.Label("You lose...\n");
                 }
                 if (GUILayout.Button("Return to Main Menu", GUILayout.Height(40)))
                 {
+                    deaths = 0;
                     mainMenuCamera.SetActive(true);
                     PhotonNetwork.Disconnect();
                     PhotonNetwork.Destroy(StaticObjects.CharacterNetworkManager.transform.parent.gameObject);
@@ -197,8 +224,11 @@ public class GameController : MonoBehaviour
             PhotonNetwork.Instantiate("Map" + random, Vector3.zero, Quaternion.identity, 0);
         }
         SpawnPlayer();
-
-        state = createdMap ? MainMenuState.AI_SPAWN : MainMenuState.IN_ROOM;
+        if (createdMap)
+        {
+            StaticObjects.AIManager.SpawnAIs(hardMode);
+        }
+        state = MainMenuState.IN_ROOM;
     }
 
     private void SpawnPlayer()
@@ -207,7 +237,7 @@ public class GameController : MonoBehaviour
         StaticObjects.CharacterNetworkManager = character.GetComponent<CharacterNetworkManager>();
         character.transform.parent = Instantiate(characterParentPrefab).transform;
 
-        EndManager endManager = Instantiate(endPrefab, createdMap ? end1 : end2, Quaternion.identity).GetComponent<EndManager>();
+        endManager = Instantiate(endPrefab, createdMap ? end1 : end2, Quaternion.identity).GetComponent<EndManager>();
         endManager.SetCharacter(character);
         endManager.OnGameEnd += OnGameEnd;
 
@@ -232,6 +262,11 @@ public class GameController : MonoBehaviour
         StartCoroutine(GameStartDelay());
     }
 
+    public void OnPlayerBackToSpawn()
+    {
+        deaths++;
+    }
+
     private IEnumerator GameStartDelay()
     {
         state = MainMenuState.IN_DELAY;
@@ -247,6 +282,7 @@ public class GameController : MonoBehaviour
         {
             StaticObjects.CharacterNetworkManager.gameObject.AddComponent<ArrowsInputManager>();
         }
+        gameStartTime = Time.time;
     }
 
     private void OnGameEnd()
@@ -267,7 +303,6 @@ enum MainMenuState
 {
     MAIN,
     CONNECTING,
-    AI_SPAWN,
     IN_ROOM,
     READY_TO_PLAY,
     IN_DELAY,

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
@@ -60,6 +61,7 @@ public class GameController : MonoBehaviour
     {
         IsGameHost = isGameHost;
         playerDeaths = 0;
+        playersReady = 0;
 
         GameObject character = PhotonNetwork.Instantiate("Character" + (IsGameHost ? 1 : 2), IsGameHost ? spawn1 : spawn2, Quaternion.identity, 0);
         character.transform.parent = Instantiate(characterParentPrefab).transform;
@@ -150,6 +152,7 @@ public class GameController : MonoBehaviour
             cnm.gameObject.AddComponent<ArrowsInputManager>();
         }
         gameStartTime = Time.time;
+        StaticObjects.AIManager.StartGame();
         GameIsActive = true;
     }
 
@@ -170,5 +173,17 @@ public class GameController : MonoBehaviour
         {
             uiManager.SetupLoser();
         }
+    }
+
+    public void StateCoroutine(RotateState rotateState)
+    {
+        StartCoroutine(Delay(rotateState));
+    }
+
+    private IEnumerator Delay(RotateState rotateState)
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        rotateState.PostCoroutine();
     }
 }

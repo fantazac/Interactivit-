@@ -33,6 +33,14 @@ public class AIManager : MonoBehaviour
         PhotonNetwork.Instantiate("BadGuy_" + (hardMode ? "Hard" : "Easy"), position, Quaternion.identity, 0);
     }
 
+    public void StartGame()
+    {
+        foreach (AI ai in ais)
+        {
+            ai.StateMachine.CurrentState.StartState();
+        }
+    }
+
     public void SetTargetsAndAIs()
     {
         CharacterNetworkManager[] players = FindObjectsOfType<CharacterNetworkManager>();

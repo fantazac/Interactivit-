@@ -10,15 +10,16 @@ public class LookAtState : State<AI>
         this.reactionTime = reactionTime;
     }
 
-    public override void UpdateStateFromServer(float value)
-    {
-
-    }
+    public override void UpdateStateFromServer(float value) { }
+    public override void UpdateStateFromServerWithVector(float value1, Vector3 value2) { }
 
     public override void EnterState(AI owner)
     {
         Debug.Log("[State].LookAt (Owner: " + owner + ") - Entering LookAt State.");
     }
+
+    public override void InitState() { }
+    public override void StartState() { }
 
     public override void UpdateState(AI owner)
     {

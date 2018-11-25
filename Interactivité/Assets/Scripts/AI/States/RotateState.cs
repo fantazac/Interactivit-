@@ -6,13 +6,15 @@ public class RotateState : State<AI>
     private float maxModifierOffset;
     private float timeElapsedSinceLastRotation;
 
+    private AINetworkManager anm;
+
     public RotateState(AINetworkManager anm, float rotationSpeed = 40, float maxModifierOffset = 20)
     {
+        this.anm = anm;
         if (StaticObjects.GameController.IsGameHost)
         {
             this.rotationSpeed = rotationSpeed;
             this.maxModifierOffset = maxModifierOffset;
-            anm.SendToServer_UpdateStateFromServer(GetRotationSpeed());
         }
     }
 
@@ -24,10 +26,22 @@ public class RotateState : State<AI>
         return rotationSpeedToSend;
     }
 
+    public override void InitState()
+    {
+        if (StaticObjects.GameController.IsGameHost)
+        {
+            anm.SendToServer_UpdateStateFromServer(GetRotationSpeed());
+        }
+    }
+
+    public override void StartState() { }
+
     public override void UpdateStateFromServer(float rotationSpeed)
     {
         this.rotationSpeed = rotationSpeed;
     }
+
+    public override void UpdateStateFromServerWithVector(float value1, Vector3 value2) { }
 
     public override void EnterState(AI owner)
     {

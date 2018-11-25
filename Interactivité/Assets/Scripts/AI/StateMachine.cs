@@ -3,16 +3,16 @@
     public State<T> CurrentState;
     public T Owner;
 
-    public StateMachine(T owner, State<T> initialState)
+    public StateMachine(T owner)
     {
         Owner = owner;
-        ChangeState(initialState);
     }
 
     public void ChangeState(State<T> newState)
     {
         CurrentState = newState;
         newState.EnterState(Owner);
+        newState.InitState();
     }
 
     public void UpdateStateMachine()

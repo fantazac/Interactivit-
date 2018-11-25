@@ -49,4 +49,12 @@ public class AIManager : MonoBehaviour
             ai.ShouldLookForTargets = true;
         }
     }
+
+    public void StartGame()
+    {
+        foreach (AI ai in ais)
+        {
+            ai.StateMachine.CurrentState.StartState();
+        }
+    }
 }

@@ -26,8 +26,10 @@ public class AI : MonoBehaviour
         NMA = GetComponent<NavMeshAgent>();
 
         defaultPosition = transform.position;
+
         anm = GetComponent<AINetworkManager>();
-        StateMachine = new StateMachine<AI>(this, DefaultBehaviour.GetDefaultBehaviour(anm));
+        StateMachine = new StateMachine<AI>(this);
+        StateMachine.ChangeState(DefaultBehaviour.GetDefaultBehaviour(anm));
     }
 
     private void Update()
@@ -68,7 +70,7 @@ public class AI : MonoBehaviour
     public void OnTargetLost()
     {
         Debug.Log("[AI]." + name + " - Lost target. Returning to default state.");
-        StateMachine = new StateMachine<AI>(this, new GoToState(defaultPosition, .3f));
+        StateMachine.ChangeState(new GoToState(anm, defaultPosition, 0.3f));
     }
 }
 

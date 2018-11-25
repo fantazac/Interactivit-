@@ -26,6 +26,11 @@ public class ChaseState : State<AI>
         anm.ai.OnTargetLost();
     }
 
+    public override void UpdateStateFromServerWithVector(float value1, Vector3 value2) { }
+
+    public override void InitState() { }
+    public override void StartState() { }
+
     public override void UpdateState(AI owner)
     {
         if (!target)
